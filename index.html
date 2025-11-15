@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Odyssefs Liagkas - Biomedical Engineer & AI Researcher</title>
+    <meta name="description" content="Fulbright Scholar and Cornell M.Eng student specializing in biomedical engineering, AI research, and innovation in medical technology.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+        /* CSS Variables for Design System */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            overflow: hidden;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('./resources/hero-biomedical.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            color: var(--text-light);
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            font-weight: 300;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: var(--text-light);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(193, 120, 23, 0.3);
+        }
+
+        /* Highlights Section */
+        .highlights {
+            padding: 6rem 0;
+            background: var(--neutral-warm);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            text-align: center;
+            margin-bottom: 4rem;
+            color: var(--primary-navy);
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .highlight-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-smooth);
+            text-align: center;
+        }
+
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .highlight-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-copper);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .highlight-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-navy);
+        }
+
+        .highlight-description {
+            color: var(--text-charcoal);
+            opacity: 0.8;
+        }
+
+        /* Timeline Section */
+        .timeline {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .timeline-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--secondary-copper);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .timeline-item.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 60%;
+            text-align: right;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 60%;
+            text-align: left;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+        }
+
+        .timeline-date {
+            font-weight: 600;
+            color: var(--secondary-copper);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-navy);
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            top: 2rem;
+            width: 12px;
+            height: 12px;
+            background: var(--secondary-copper);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        /* Research Preview */
+        .research-preview {
+            padding: 6rem 0;
+            background: var(--neutral-warm);
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .research-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-smooth);
+        }
+
+        .research-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .research-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .research-content {
+            padding: 2rem;
+        }
+
+        .research-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--primary-navy);
+        }
+
+        .research-description {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .research-link {
+            color: var(--secondary-copper);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .research-link:hover {
+            color: var(--primary-navy);
+        }
+
+        /* Stats Section */
+        .stats {
+            padding: 4rem 0;
+            background: var(--primary-navy);
+            color: var(--text-light);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--secondary-copper);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin: 0 0 0 30px;
+                text-align: left;
+            }
+
+            .timeline-line {
+                left: 15px;
+            }
+
+            .timeline-marker {
+                left: 15px;
+            }
+
+            .hero-content {
+                padding: 0 1rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Color cycling effect */
+        .color-cycle .color-char {
+            transition: color 0.1s ease;
+        }
+
+        /* Loading animation */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="#home" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="research.html">Research</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-background"></div>
+        <canvas id="hero-canvas" class="hero-canvas"></canvas>
+        <div class="hero-content">
+            <h1 class="hero-title">Odyssefs Liagkas</h1>
+            <p class="hero-subtitle">Biomedical Engineer • AI Researcher • Fulbright Scholar</p>
+            <p class="hero-description">
+                Combining engineering excellence with cutting-edge research in biomedical innovation, 
+                AI applications in medicine, and sustainable technology solutions.
+            </p>
+            <a href="about.html" class="cta-button">Explore My Journey</a>
+        </div>
+    </section>
+
+    <!-- Highlights Section -->
+    <section class="highlights animate-on-scroll">
+        <div class="container">
+            <h2 class="section-title">Key Achievements</h2>
+            <div class="highlights-grid">
+                <div class="highlight-card tilt-card">
+                    <div class="highlight-icon">🎓</div>
+                    <h3 class="highlight-title">Fulbright Scholar</h3>
+                    <p class="highlight-description">
+                        Awarded the prestigious Fulbright Graduate Student Scholarship for advanced studies 
+                        in Biomedical Engineering at Cornell University.
+                    </p>
+                </div>
+                <div class="highlight-card tilt-card">
+                    <div class="highlight-icon">🔬</div>
+                    <h3 class="highlight-title">Research Excellence</h3>
+                    <p class="highlight-description">
+                        Second Prize for Basic Research at the 49th Annual Panhellenic Medical Conference 
+                        for innovative cancer and inflammation research.
+                    </p>
+                </div>
+                <div class="highlight-card tilt-card">
+                    <div class="highlight-icon">🏆</div>
+                    <h3 class="highlight-title">Innovation Leader</h3>
+                    <p class="highlight-description">
+                        Co-founder of FunguWear, developing sustainable biomaterials from mycelium, 
+                        winner of InnovInAgri 2022 Business Competition.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline Section -->
+    <section class="timeline animate-on-scroll">
+        <div class="container">
+            <h2 class="section-title">Academic Journey</h2>
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2025 - Present</div>
+                        <h3 class="timeline-title">Cornell University</h3>
+                        <p>M.Eng in Biomedical Engineering with focus on medical device innovation and robotics.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2024 - 2025</div>
+                        <h3 class="timeline-title">NYU Tandon School</h3>
+                        <p>Computer Science Bridge Program - 400 hours of intensive programming and systems knowledge.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-date">2019 - 2023</div>
+                        <h3 class="timeline-title">University of Athens</h3>
+                        <p>B.Sc. in Biology with GPA 8.09/10, specializing in cancer and inflammation research.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Preview -->
+    <section class="research-preview animate-on-scroll">
+        <div class="container">
+            <h2 class="section-title">Research Focus</h2>
+            <div class="research-grid">
+                <div class="research-card tilt-card">
+                    <img src="https://kimi-web-img.moonshot.cn/img/www.medicaldevice-network.com/b2c60abc2f92e21f8c5e1d626fc3db087305f546.jpg" 
+                         alt="Tissue Tensioner Research" class="research-image">
+                    <div class="research-content">
+                        <h3 class="research-title">Tissue Tensioner Innovation</h3>
+                        <p class="research-description">
+                            Developing a novel medical device for Total Knee Arthroplasty incorporating 
+                            patellar tension measurement using advanced robotics and CAD modeling.
+                        </p>
+                        <a href="research.html" class="research-link">Learn More →</a>
+                    </div>
+                </div>
+
+                <div class="research-card tilt-card">
+                    <img src="https://kimi-web-img.moonshot.cn/img/axenehp.com/c39ac6084fa48ed006e8b83794f38f554b1c373b.jpg" 
+                         alt="AI Cryo-EM Research" class="research-image">
+                    <div class="research-content">
+                        <h3 class="research-title">AI in Cryogenic Electron Microscopy</h3>
+                        <p class="research-description">
+                            Implementing PyTorch-based AI pipelines for advanced cryo-EM applications 
+                            in genetic and protein engineering research.
+                        </p>
+                        <a href="research.html" class="research-link">Learn More →</a>
+                    </div>
+                </div>
+
+                <div class="research-card tilt-card">
+                    <img src="https://kimi-web-img.moonshot.cn/img/symbiosisonlinepublishing.com/e342ccd322aa34dcec50906bad9165105d355258.jpg" 
+                         alt="Oleuropein Research" class="research-image">
+                    <div class="research-content">
+                        <h3 class="research-title">Oleuropein Analogues Research</h3>
+                        <p class="research-description">
+                            Investigating anti-cancer and anti-inflammatory effects of semi-synthetic 
+                            oleuropein analogues through in vitro and in vivo experiments.
+                        </p>
+                        <a href="research.html" class="research-link">Learn More →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats stats-section animate-on-scroll">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="4">0</div>
+                    <div class="stat-label">Research Publications</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="6">0</div>
+                    <div class="stat-label">Conference Presentations</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="3">0</div>
+                    <div class="stat-label">Major Awards</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number counter" data-target="5">0</div>
+                    <div class="stat-label">Research Institutions</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="about.html">About</a>
+                <a href="research.html">Research</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="main.js"></script>
+</body>
+</html>

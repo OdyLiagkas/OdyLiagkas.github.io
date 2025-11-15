@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Odyssefs Liagkas</title>
+    <meta name="description" content="Learn about Odyssefs Liagkas's academic journey, research experience, and professional background in biomedical engineering and AI.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    
+    <style>
+        /* Import base styles from index.html */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .page-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .page-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 4rem 0;
+        }
+
+        .content-section:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 3rem;
+            color: var(--primary-navy);
+            text-align: center;
+        }
+
+        /* Education Cards */
+        .education-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .education-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-smooth);
+        }
+
+        .education-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .education-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .education-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .education-date {
+            color: var(--secondary-copper);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .education-location {
+            color: var(--accent-sage);
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .education-details {
+            list-style: none;
+        }
+
+        .education-details li {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .education-details li::before {
+            content: '•';
+            color: var(--secondary-copper);
+            position: absolute;
+            left: 0;
+        }
+
+        /* Experience Section */
+        .experience-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+            transition: var(--transition-smooth);
+        }
+
+        .experience-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .experience-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-company {
+            color: var(--secondary-copper);
+            font-weight: 600;
+        }
+
+        .experience-date {
+            color: var(--accent-sage);
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .experience-description {
+            margin-bottom: 1rem;
+        }
+
+        .experience-highlights {
+            list-style: none;
+        }
+
+        .experience-highlights li {
+            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .experience-highlights li::before {
+            content: '▸';
+            color: var(--secondary-copper);
+            position: absolute;
+            left: 0;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .skill-category {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .skill-category h3 {
+            font-family: var(--font-display);
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .skill-tag {
+            background: var(--secondary-copper);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Awards Section */
+        .awards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .award-item {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .award-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .award-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-copper);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .award-title {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .award-organization {
+            color: var(--secondary-copper);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .education-header,
+            .experience-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .education-date,
+            .experience-date {
+                align-self: flex-start;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="active">About</a></li>
+                <li><a href="research.html">Research</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="page-hero">
+            <div class="container">
+                <h1>About Me</h1>
+                <p>
+                    A passionate biomedical engineer and AI researcher dedicated to advancing medical technology 
+                    and improving healthcare outcomes through innovative solutions.
+                </p>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section class="content-section animate-on-scroll">
+            <div class="container">
+                <h2 class="section-title">Education</h2>
+                <div class="education-grid">
+                    <div class="education-card">
+                        <div class="education-header">
+                            <div>
+                                <h3 class="education-title">Master of Engineering</h3>
+                                <p class="education-location">Cornell University, College of Engineering</p>
+                            </div>
+                            <span class="education-date">2025 - Present</span>
+                        </div>
+                        <ul class="education-details">
+                            <li>Biomedical Engineering with leadership focus</li>
+                            <li>Fulbright Graduate Student Scholarship</li>
+                            <li>Michael C. Soteriades '41 Scholarship</li>
+                            <li>Design Project: Tissue Tensioner for Total Knee Replacement</li>
+                            <li>Coursework: Robotics, Bio-Robotics, Circuits/Signals/Sensors</li>
+                            <li>Business Courses: Management of Technology and Innovation</li>
+                        </ul>
+                    </div>
+
+                    <div class="education-card">
+                        <div class="education-header">
+                            <div>
+                                <h3 class="education-title">Computer Science Bridge Program</h3>
+                                <p class="education-location">NYU Tandon School of Engineering</p>
+                            </div>
+                            <span class="education-date">2024 - 2025</span>
+                        </div>
+                        <ul class="education-details">
+                            <li>400 hours of intensive computer science education</li>
+                            <li>Awarded with distinction</li>
+                            <li>Mathematics and Calculus</li>
+                            <li>C++ Programming and Memory Management</li>
+                            <li>Principles of Operating Systems</li>
+                            <li>Computer Networks</li>
+                        </ul>
+                    </div>
+
+                    <div class="education-card">
+                        <div class="education-header">
+                            <div>
+                                <h3 class="education-title">Bachelor of Science in Biology</h3>
+                                <p class="education-location">National and Kapodistrian University of Athens</p>
+                            </div>
+                            <span class="education-date">2019 - 2023</span>
+                        </div>
+                        <ul class="education-details">
+                            <li>GPA: 8.09/10 (Excellent performance)</li>
+                            <li>Diploma Thesis: Oleuropein analogues in cancer and inflammation</li>
+                            <li>Thesis Grade: 10/10 (Perfect score)</li>
+                            <li>Second Prize for Basic Research at 49th Panhellenic Medical Conference</li>
+                            <li>Extensive laboratory experience in immunology and molecular biology</li>
+                        </ul>
+                    </div>
+
+                    <div class="education-card">
+                        <div class="education-header">
+                            <div>
+                                <h3 class="education-title">High School Diploma</h3>
+                                <p class="education-location">Hellenic American Educational Foundation (Athens College)</p>
+                            </div>
+                            <span class="education-date">2016 - 2019</span>
+                        </div>
+                        <ul class="education-details">
+                            <li>Apolytirion GPA: 19.7/20 with honors</li>
+                            <li>Excellence Award from Ministry of Education</li>
+                            <li>2nd place in Panhellenic Student Physics Competition 'Aristotle' 2017</li>
+                            <li>Production Manager at award-winning virtual companies</li>
+                            <li>Leadership experience in business competitions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section class="content-section animate-on-scroll">
+            <div class="container">
+                <h2 class="section-title">Professional Experience</h2>
+                
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <h3 class="experience-title">Design Engineer</h3>
+                            <p class="experience-company">Touchdown Medical Technologies (Simulated Startup), Cornell Engineering</p>
+                        </div>
+                        <span class="experience-date">Aug 2025 - Present</span>
+                    </div>
+                    <p class="experience-description">
+                        Part of the M.Eng. program developing innovative medical devices using the Biodesign Innovation Process.
+                    </p>
+                    <ul class="experience-highlights">
+                        <li>Developing novel Tissue Tensioner incorporating patellar tension for Total Knee Arthroplasty</li>
+                        <li>Gaining proficiency in 6-DoF Robot Arm Biomechanical Testing and CAD Modeling</li>
+                        <li>Collaborating with Hospital for Special Surgery (HSS) surgeons and engineers</li>
+                        <li>Advanced skills in 3D Scanning, 3D Printing, Soldering and Microelectronics</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <h3 class="experience-title">Research Fellow Intern</h3>
+                            <p class="experience-company">Archimedes AI Research Unit - Athena Research Center</p>
+                        </div>
+                        <span class="experience-date">Sep 2024 - Jun 2025</span>
+                    </div>
+                    <p class="experience-description">
+                        AI, Data Science and Algorithms research with focus on cryogenic electron microscopy applications.
+                    </p>
+                    <ul class="experience-highlights">
+                        <li>Developed PyTorch-based AI pipeline for cryo-EM applications</li>
+                        <li>Conducted research in AI implementation for genetic and protein engineering</li>
+                        <li>Worked in Dr. Panagakis' team within Computer Vision and Robotics group</li>
+                        <li>Received scholarship for "Implementation of Informatics in Biosciences and Medicine"</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <h3 class="experience-title">Medical Laboratory Scientist</h3>
+                            <p class="experience-company">Hellenic Armed Forces, 401 Military Hospital</p>
+                        </div>
+                        <span class="experience-date">Sep 2023 - Jun 2024</span>
+                    </div>
+                    <p class="experience-description">
+                        Mandatory military service as a specialized medical laboratory scientist in BSL-3 laboratory.
+                    </p>
+                    <ul class="experience-highlights">
+                        <li>Supported Biopathology and Molecular Diagnostics Lab operations</li>
+                        <li>Independently managed entire BSL-3 laboratory during 24-hour shifts</li>
+                        <li>Carried out diagnostic tests, interpreted results, and reported to clinicians</li>
+                        <li>Trained new laboratory members and participated in specialized drill team</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <h3 class="experience-title">Research Intern</h3>
+                            <p class="experience-company">National Hellenic Research Foundation</p>
+                        </div>
+                        <span class="experience-date">Jul 2023 - Aug 2023</span>
+                    </div>
+                    <p class="experience-description">
+                        Structural bioinformatics research in Dr. Chrysina's team at the Structural Biology Laboratory.
+                    </p>
+                    <ul class="experience-highlights">
+                        <li>Monitored experimental procedures for protein isolation and purification</li>
+                        <li>Conducted kinetic and crystallographic studies</li>
+                        <li>Prepared crystals for synchrotron radiation facility experiments</li>
+                        <li>Used specialized software for 3D enzyme structure prediction and analysis</li>
+                    </ul>
+                </div>
+
+                <div class="experience-item">
+                    <div class="experience-header">
+                        <div>
+                            <h3 class="experience-title">Research Student</h3>
+                            <p class="experience-company">National and Kapodistrian University of Athens</p>
+                        </div>
+                        <span class="experience-date">Sep 2022 - Jul 2023</span>
+                    </div>
+                    <p class="experience-description">
+                        Immunology research at the Flow Cytometry Unit as part of Dr. Tsitsilonis' team.
+                    </p>
+                    <ul class="experience-highlights">
+                        <li>Monitored Flow Cytometry analyses of leukemia and myeloma samples</li>
+                        <li>Researched anti-cancer and anti-inflammatory effects of oleuropein analogues</li>
+                        <li>Conducted both in vitro and in vivo experiments</li>
+                        <li>Analyzed findings and reported to supervisor regularly</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section class="content-section animate-on-scroll">
+            <div class="container">
+                <h2 class="section-title">Skills & Expertise</h2>
+                <div class="skills-grid">
+                    <div class="skill-category">
+                        <h3>Programming Languages</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Python</span>
+                            <span class="skill-tag">R</span>
+                            <span class="skill-tag">Perl</span>
+                            <span class="skill-tag">C++</span>
+                            <span class="skill-tag">MATLAB</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Laboratory Techniques</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Flow Cytometry</span>
+                            <span class="skill-tag">Cell Culture</span>
+                            <span class="skill-tag">Protein Purification</span>
+                            <span class="skill-tag">Molecular Diagnostics</span>
+                            <span class="skill-tag">Crystallography</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Engineering Tools</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">CAD Modeling</span>
+                            <span class="skill-tag">3D Printing</span>
+                            <span class="skill-tag">Robotics</span>
+                            <span class="skill-tag">Microelectronics</span>
+                            <span class="skill-tag">Biomechanical Testing</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Languages</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Greek (Native)</span>
+                            <span class="skill-tag">English (Fluent)</span>
+                            <span class="skill-tag">Japanese (Limited Working)</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Certifications</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Computer Usage Knowledge</span>
+                            <span class="skill-tag">Pedagogical & Teaching Proficiency</span>
+                            <span class="skill-tag">Deep Neural Networks with PyTorch</span>
+                            <span class="skill-tag">Genomic Data Science Specialization</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-category">
+                        <h3>Research Areas</h3>
+                        <div class="skill-list">
+                            <span class="skill-tag">Biomedical Engineering</span>
+                            <span class="skill-tag">AI in Medicine</span>
+                            <span class="skill-tag">Cryogenic Electron Microscopy</span>
+                            <span class="skill-tag">Cancer Research</span>
+                            <span class="skill-tag">Sustainable Materials</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Awards Section -->
+        <section class="content-section animate-on-scroll">
+            <div class="container">
+                <h2 class="section-title">Awards & Recognition</h2>
+                <div class="awards-grid">
+                    <div class="award-item">
+                        <div class="award-icon">🏆</div>
+                        <h3 class="award-title">Fulbright Graduate Student Scholarship</h3>
+                        <p class="award-organization">Fulbright Foundation</p>
+                        <p>Prestigious scholarship for graduate studies in the United States</p>
+                    </div>
+
+                    <div class="award-item">
+                        <div class="award-icon">🥈</div>
+                        <h3 class="award-title">Second Prize for Basic Research</h3>
+                        <p class="award-organization">49th Annual Panhellenic Medical Conference</p>
+                        <p>Awarded for outstanding research in cancer and inflammation</p>
+                    </div>
+
+                    <div class="award-item">
+                        <div class="award-icon">🥇</div>
+                        <h3 class="award-title">1st Place InnovInAgri 2022</h3>
+                        <p class="award-organization">Business Idea Competition</p>
+                        <p>Won for FunguWear sustainable biomaterials project</p>
+                    </div>
+
+                    <div class="award-item">
+                        <div class="award-icon">🎖️</div>
+                        <h3 class="award-title">Honorary Leave</h3>
+                        <p class="award-organization">Hellenic Armed Forces</p>
+                        <p>Awarded for exceptional military service performance</p>
+                    </div>
+
+                    <div class="award-item">
+                        <div class="award-icon">🏅</div>
+                        <h3 class="award-title">Excellence Award</h3>
+                        <p class="award-organization">Ministry of Education, Greece</p>
+                        <p>For academic excellence throughout high school</p>
+                    </div>
+
+                    <div class="award-item">
+                        <div class="award-icon">🎯</div>
+                        <h3 class="award-title">Physics Competition Award</h3>
+                        <p class="award-organization">5th Panhellenic Student Physics Competition 'Aristotle'</p>
+                        <p>2nd Excellence Award among 1st and 2nd grade students</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="research.html">Research</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="main.js"></script>
+</body>
+</html>

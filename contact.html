@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Odyssefs Liagkas</title>
+    <meta name="description" content="Get in touch with Odyssefs Liagkas for research collaborations, professional opportunities, and academic discussions.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <style>
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .page-hero h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            margin-bottom: 1rem;
+        }
+
+        .page-hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 4rem 0;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            align-items: start;
+        }
+
+        /* Contact Information */
+        .contact-info {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .info-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--primary-navy);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            transition: var(--transition-smooth);
+        }
+
+        .contact-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--secondary-copper);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .contact-details h3 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-details p {
+            color: var(--accent-sage);
+            font-weight: 500;
+        }
+
+        .contact-details a {
+            color: var(--secondary-copper);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .contact-details a:hover {
+            color: var(--primary-navy);
+        }
+
+        /* Contact Form */
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .form-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--primary-navy);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--primary-navy);
+            font-weight: 600;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            transition: var(--transition-smooth);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--secondary-copper);
+            box-shadow: 0 0 0 3px rgba(193, 120, 23, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-button {
+            width: 100%;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+        }
+
+        .form-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* Professional Networks */
+        .networks-section {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 3rem;
+            color: var(--primary-navy);
+            text-align: center;
+        }
+
+        .networks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .network-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .network-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .network-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-copper);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .network-title {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            color: var(--primary-navy);
+            margin-bottom: 1rem;
+        }
+
+        .network-description {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .network-link {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .network-link:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Collaboration Section */
+        .collaboration-section {
+            padding: 4rem 0;
+        }
+
+        .collaboration-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .collaboration-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            color: var(--primary-navy);
+            margin-bottom: 2rem;
+        }
+
+        .collaboration-description {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+        }
+
+        .collaboration-areas {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .collaboration-area {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            transition: var(--transition-smooth);
+        }
+
+        .collaboration-area:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .area-name {
+            font-weight: 600;
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .area-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Success Message */
+        .success-message {
+            background: #10b981;
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .contact-info,
+            .contact-form {
+                padding: 2rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="research.html">Research</a></li>
+                <li><a href="contact.html" class="active">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="page-hero">
+            <div class="container">
+                <h1>Get In Touch</h1>
+                <p>
+                    I'm always interested in discussing research collaborations, professional opportunities, 
+                    and innovative projects in biomedical engineering and AI.
+                </p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <div class="container">
+                <div class="contact-grid">
+                    <!-- Contact Information -->
+                    <div class="contact-info animate-on-scroll">
+                        <h2 class="info-title">Contact Information</h2>
+                        
+                        <div class="contact-item">
+                            <div class="contact-icon">📧</div>
+                            <div class="contact-details">
+                                <h3>Email</h3>
+                                <p><a href="mailto:odliagkas@gmail.com">odliagkas@gmail.com</a></p>
+                                <p><a href="mailto:ol86@cornell.edu">ol86@cornell.edu</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">📱</div>
+                            <div class="contact-details">
+                                <h3>Phone</h3>
+                                <p>USA: <a href="tel:+16073423224">+1 (607) 342-3224</a></p>
+                                <p>Greece: <a href="tel:+306947003929">+30 6947003929</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">🎓</div>
+                            <div class="contact-details">
+                                <h3>Academic Affiliation</h3>
+                                <p>Cornell University</p>
+                                <p>College of Engineering</p>
+                                <p>Biomedical Engineering</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-icon">📍</div>
+                            <div class="contact-details">
+                                <h3>Location</h3>
+                                <p>Ithaca, NY, USA</p>
+                                <p>Athens, Greece</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Form -->
+                    <div class="contact-form animate-on-scroll">
+                        <h2 class="form-title">Send a Message</h2>
+                        <form id="contact-form">
+                            <div class="form-group">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" id="name" name="name" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input type="text" id="subject" name="subject" class="form-input" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea id="message" name="message" class="form-textarea" required 
+                                          placeholder="Tell me about your research interests, collaboration ideas, or any questions you have..."></textarea>
+                            </div>
+
+                            <button type="submit" class="form-button">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Professional Networks -->
+        <section class="networks-section animate-on-scroll">
+            <div class="container">
+                <h2 class="section-title">Professional Networks</h2>
+                <div class="networks-grid">
+                    <div class="network-card">
+                        <div class="network-icon">💼</div>
+                        <h3 class="network-title">LinkedIn</h3>
+                        <p class="network-description">
+                            Connect with me on LinkedIn for professional networking and career opportunities.
+                        </p>
+                        <a href="https://www.linkedin.com" target="_blank" class="network-link">Connect on LinkedIn</a>
+                    </div>
+
+                    <div class="network-card">
+                        <div class="network-icon">🐙</div>
+                        <h3 class="network-title">GitHub</h3>
+                        <p class="network-description">
+                            Explore my research code and software projects on GitHub.
+                        </p>
+                        <a href="https://github.com" target="_blank" class="network-link">View GitHub Profile</a>
+                    </div>
+
+                    <div class="network-card">
+                        <div class="network-icon">📚</div>
+                        <h3 class="network-title">ResearchGate</h3>
+                        <p class="network-description">
+                            Follow my research publications and collaborations on ResearchGate.
+                        </p>
+                        <a href="https://www.researchgate.net" target="_blank" class="network-link">Follow on ResearchGate</a>
+                    </div>
+
+                    <div class="network-card">
+                        <div class="network-icon">🎓</div>
+                        <h3 class="network-title">Google Scholar</h3>
+                        <p class="network-description">
+                            View my academic publications and citation metrics on Google Scholar.
+                        </p>
+                        <a href="https://scholar.google.com" target="_blank" class="network-link">View Publications</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Collaboration Opportunities -->
+        <section class="collaboration-section animate-on-scroll">
+            <div class="container">
+                <div class="collaboration-content">
+                    <h2 class="collaboration-title">Collaboration Opportunities</h2>
+                    <p class="collaboration-description">
+                        I'm always open to discussing research collaborations, innovative projects, and opportunities 
+                        to contribute to the advancement of biomedical engineering and AI in medicine. Whether you're 
+                        from academia, industry, or a fellow researcher, I'd love to hear from you.
+                    </p>
+
+                    <div class="collaboration-areas">
+                        <div class="collaboration-area">
+                            <div class="area-name">Biomedical Engineering</div>
+                            <div class="area-description">Medical device innovation, robotics, biomechanics</div>
+                        </div>
+                        <div class="collaboration-area">
+                            <div class="area-name">AI in Medicine</div>
+                            <div class="area-description">Machine learning, computer vision, cryo-EM</div>
+                        </div>
+                        <div class="collaboration-area">
+                            <div class="area-name">Cancer Research</div>
+                            <div class="area-description">Drug discovery, inflammation, molecular biology</div>
+                        </div>
+                        <div class="collaboration-area">
+                            <div class="area-name">Sustainable Tech</div>
+                            <div class="area-description">Biomaterials, green technology, innovation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="research.html">Research</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="main.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeContactForm();
+        });
+    </script>
+</body>
+</html>
