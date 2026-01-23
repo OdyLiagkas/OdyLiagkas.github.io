@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Odyssefs Liagkas - Biomedical Engineer & AI Researcher</title>
+    <title>Odyssefs Liagkas - Fulbrighter</title>
+    <link rel="icon" type="image/png" href="resources/favicon.png">
     <meta name="description" content="Fulbright Scholar and Cornell M.Eng student specializing in biomedical engineering, AI research, and innovation in medical technology.">
     
     <!-- Fonts -->
@@ -77,7 +78,19 @@
             color: var(--text-light);
             text-decoration: none;
         }
+        .profile-container {
+    text-align: center;
+    margin: 20px 0;
+}
 
+.profile-photo {
+    width: 150px;        /* Adjust size as needed */
+    height: 150px;       /* Keep equal for perfect circle */
+    border-radius: 50%;  /* Creates the circular shape */
+    object-fit: cover;   /* Ensures photo fills the circle nicely */
+    border: 3px solid #fff;  /* Optional: white border */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);  /* Optional: subtle shadow */
+}
         .nav-links {
             display: flex;
             list-style: none;
@@ -190,6 +203,10 @@
             transition: var(--transition-smooth);
             box-shadow: var(--shadow-medium);
         }
+.cta-button-secondary {
+    background-color: #a92b08;  /* Green - change to any color you want */
+    /* Or try: #6c757d (gray), #dc3545 (red), #ffc107 (yellow), etc. */
+}
 
         .cta-button:hover {
             transform: translateY(-2px);
@@ -527,7 +544,7 @@
             <ul class="nav-links">
                 <li><a href="#home">Home</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="research.html">Research</a></li>
+                <li><a href="research.html">Fast Robots Labs</a></li>
                 <li><a href="contact.html">Contact</a></li>
             </ul>
         </div>
@@ -538,51 +555,27 @@
         <div class="hero-background"></div>
         <canvas id="hero-canvas" class="hero-canvas"></canvas>
         <div class="hero-content">
+            <div class="profile-container">
+    <img src="resources/photo.jpeg" alt="Odyssefs Liagkas" class="profile-photo">
+</div>
             <h1 class="hero-title">Odyssefs Liagkas</h1>
-            <p class="hero-subtitle">Biomedical Engineer • AI Researcher • Fulbright Scholar</p>
+            <p class="hero-subtitle">M.Eng. in Biomedical Engineering at Cornell <br>Fulbright Scholar • Michael C. Soteriades Scholar</p>
+            <p class="hero-subtitle"> Fast Robots - ECE 5160</p>
             <p class="hero-description">
-                Combining engineering excellence with cutting-edge research in biomedical innovation, 
-                AI applications in medicine, and sustainable technology solutions.
+                Background in Biology and Computer Science <br>
+             Blending engineering and science expertise with leadership
             </p>
-            <a href="about.html" class="cta-button">Explore My Journey</a>
+            <a href="about.html" class="cta-button">About Me</a>
+            <br><br>
+            <a href="research.html" class="cta-button cta-button-secondary">Fast Robots Labs</a>
         </div>
+        
     </section>
 
-    <!-- Highlights Section -->
-    <section class="highlights animate-on-scroll">
-        <div class="container">
-            <h2 class="section-title">Key Achievements</h2>
-            <div class="highlights-grid">
-                <div class="highlight-card tilt-card">
-                    <div class="highlight-icon">🎓</div>
-                    <h3 class="highlight-title">Fulbright Scholar</h3>
-                    <p class="highlight-description">
-                        Awarded the prestigious Fulbright Graduate Student Scholarship for advanced studies 
-                        in Biomedical Engineering at Cornell University.
-                    </p>
-                </div>
-                <div class="highlight-card tilt-card">
-                    <div class="highlight-icon">🔬</div>
-                    <h3 class="highlight-title">Research Excellence</h3>
-                    <p class="highlight-description">
-                        Second Prize for Basic Research at the 49th Annual Panhellenic Medical Conference 
-                        for innovative cancer and inflammation research.
-                    </p>
-                </div>
-                <div class="highlight-card tilt-card">
-                    <div class="highlight-icon">🏆</div>
-                    <h3 class="highlight-title">Innovation Leader</h3>
-                    <p class="highlight-description">
-                        Co-founder of FunguWear, developing sustainable biomaterials from mycelium, 
-                        winner of InnovInAgri 2022 Business Competition.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- Timeline Section -->
-    <section class="timeline animate-on-scroll">
+    <!--<section class="timeline animate-on-scroll">
         <div class="container">
             <h2 class="section-title">Academic Journey</h2>
             <div class="timeline-container">
@@ -616,7 +609,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section>-->
 
     <!-- Research Preview -->
     <section class="research-preview animate-on-scroll">
@@ -627,12 +620,12 @@
                     <img src="https://kimi-web-img.moonshot.cn/img/www.medicaldevice-network.com/b2c60abc2f92e21f8c5e1d626fc3db087305f546.jpg" 
                          alt="Tissue Tensioner Research" class="research-image">
                     <div class="research-content">
-                        <h3 class="research-title">Tissue Tensioner Innovation</h3>
+                        <h3 class="research-title">Tissue Tensiometer Innovation</h3>
                         <p class="research-description">
                             Developing a novel medical device for Total Knee Arthroplasty incorporating 
-                            patellar tension measurement using advanced robotics and CAD modeling.
+                            patellar tension measurement, using 6 DoF robotic arm for testing.
                         </p>
-                        <a href="research.html" class="research-link">Learn More →</a>
+                        <!--<a href="research.html" class="research-link">Learn More →</a> -->
                     </div>
                 </div>
 
@@ -643,24 +636,58 @@
                         <h3 class="research-title">AI in Cryogenic Electron Microscopy</h3>
                         <p class="research-description">
                             Implementing PyTorch-based AI pipelines for advanced cryo-EM applications 
-                            in genetic and protein engineering research.
+                            in protein modeling.
                         </p>
-                        <a href="research.html" class="research-link">Learn More →</a>
+                        <!--<a href="research.html" class="research-link">Learn More →</a>-->
                     </div>
                 </div>
 
                 <div class="research-card tilt-card">
-                    <img src="https://kimi-web-img.moonshot.cn/img/symbiosisonlinepublishing.com/e342ccd322aa34dcec50906bad9165105d355258.jpg" 
+                    <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&auto=format&fit=crop" 
                          alt="Oleuropein Research" class="research-image">
                     <div class="research-content">
-                        <h3 class="research-title">Oleuropein Analogues Research</h3>
+                        <h3 class="research-title">Cancer & Inflammation: in vivo and in vitro Research</h3>
                         <p class="research-description">
                             Investigating anti-cancer and anti-inflammatory effects of semi-synthetic 
                             oleuropein analogues through in vitro and in vivo experiments.
                         </p>
-                        <a href="research.html" class="research-link">Learn More →</a>
+                        <!--<a href="research.html" class="research-link">Learn More →</a> -->
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+
+        <!-- Highlights Section -->
+    <section class="highlights animate-on-scroll">
+        <div class="container">
+            <h2 class="section-title">Sample Achievements</h2>
+            <div class="highlights-grid">
+                <div class="highlight-card tilt-card">
+                    <div class="highlight-icon">🎓</div>
+                    <h3 class="highlight-title">Fulbright Scholar</h3>
+                    <p class="highlight-description">
+                        Awarded the prestigious Fulbright Graduate Student Scholarship for advanced studies 
+                        in Biomedical Engineering at Cornell University.
+                    </p>
+                </div>
+                <div class="highlight-card tilt-card">
+                    <div class="highlight-icon">🔬</div>
+                    <h3 class="highlight-title">Research Excellence</h3>
+                    <p class="highlight-description">
+                        Second Prize for Basic Research at the 49th Annual Panhellenic Medical Conference 
+                        for innovative cancer and inflammation research.
+                    </p>
+                </div>
+               <!-- <div class="highlight-card tilt-card">
+                    <div class="highlight-icon">🏆</div>
+                    <h3 class="highlight-title">Innovation Leader</h3>
+                    <p class="highlight-description">
+                        Co-founder of FunguWear, developing sustainable biomaterials from mycelium, 
+                        winner of InnovInAgri 2022 Business Competition.
+                    </p>
+                </div> -->
             </div>
         </div>
     </section>
@@ -670,33 +697,30 @@
         <div class="container">
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-number counter" data-target="4">0</div>
+                    <div class="stat-number counter" data-target="2">0</div>
                     <div class="stat-label">Research Publications</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number counter" data-target="6">0</div>
+                    <div class="stat-number counter" data-target="5">0</div>
                     <div class="stat-label">Conference Presentations</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number counter" data-target="3">0</div>
-                    <div class="stat-label">Major Awards</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number counter" data-target="5">0</div>
+                    <div class="stat-number counter" data-target="4">0</div>
                     <div class="stat-label">Research Institutions</div>
                 </div>
             </div>
         </div>
     </section>
 
+
+    
     <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-links">
                 <a href="about.html">About</a>
-                <a href="research.html">Research</a>
                 <a href="contact.html">Contact</a>
-                <a href="https://www.linkedin.com" target="_blank">LinkedIn</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
             </div>
             <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
         </div>
