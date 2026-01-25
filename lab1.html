@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lab 1 - Fast Robots | Odyssefs Liagkas</title>
-    <meta name="description" content="Lab 1: Introduction to Fast Robots - Setup, Bluetooth connectivity, and basic robot control.">
+    <meta name="description" content="Lab 1: The Artemis board and Bluetooth.">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -387,8 +387,10 @@
     <!-- Lab Header -->
     <header class="lab-header">
         <div class="container">
-            <h1>Lab 1: Introduction to Fast Robots</h1>
-            <p>Setup, Bluetooth connectivity, and basic robot control</p>
+            <h1>Lab 1: The Artemis board and Bluetooth</h1>
+            <p>
+
+This lab is divided into two parts, Lab 1A, which covers the Arduino IDE and programming the Artemis board, and Lab 1B, which covers Bluetooth connectivity and using Jupyter Lab notebooks.</p>
         </div>
     </header>
 
@@ -401,55 +403,58 @@
                 <h2 class="section-title">Objectives</h2>
                 <div class="section-content">
                     <ul>
-                        <li>Set up the Artemis Nano board and development environment</li>
-                        <li>Establish Bluetooth communication between computer and robot</li>
-                        <li>Implement basic motor control and movement commands</li>
-                        <li>Test robot responsiveness and debug connection issues</li>
+                        <li>1A: Setup and become familiar with the Arduino IDE and the Artemis board</li>
+                        <li>1B: Establish communication between computer and the Artemis board through the Bluetooth stack</li>
+                        <li>1B: Eestablish a framework for sending data from the Artemis to the computer</li>
                     </ul>
                 </div>
             </section>
 
-            <!-- Materials Section -->
+            <!-- Tasks Section -->
             <section class="content-section animate-on-scroll">
-                <h2 class="section-title">Materials & Setup</h2>
+                <h2 class="section-title">Tasks</h2>
                 <div class="section-content">
-                    <p>The following hardware and software components were used in this lab:</p>
-                    
-                    <div class="highlight-box">
-                        <h4>Hardware</h4>
-                        <ul>
-                            <li>Artemis Nano microcontroller</li>
-                            <li>Robot chassis with dual DC motors</li>
-                            <li>Bluetooth module (HM-10 or similar)</li>
-                            <li>Power supply (LiPo battery)</li>
-                            <li>Jumper wires and breadboard</li>
+                    <ul>
+                            <li>Blink</li>
+                            <li>Apollo3 serial</li>
+                            <li>Apollo3 analogRead</li>
+                            <li>PDM MicrophoneOutput</li>
+                            <li>Simplified Electronic Tuner (Graduate lelel)</li>
                         </ul>
                     </div>
 
-                    <div class="highlight-box">
+                    <!--<div class="highlight-box">
                         <h4>Software</h4>
                         <ul>
                             <li>Arduino IDE with Artemis board package</li>
                             <li>Python 3.8+ with pyserial library</li>
                             <li>Custom Bluetooth communication library</li>
                         </ul>
-                    </div>
+                    </div> -->
 
                     <!-- Setup Image -->
-                    <div class="lab-image">
+                    <!--<div class="lab-image">
                         <img src="resources/lab1-setup.jpg" alt="Initial hardware setup showing Artemis Nano and connections">
                     </div>
-                    <p class="image-caption">Figure 1: Initial hardware setup with Artemis Nano and Bluetooth module</p>
+                    <p class="image-caption">Figure 1: Initial hardware setup with Artemis Nano and Bluetooth module</p> -->
                 </div>
             </section>
 
-            <!-- Procedure Section -->
+            <!-- Tasks' Proof Section template -->
             <section class="content-section animate-on-scroll">
-                <h2 class="section-title">Procedure</h2>
+                <h2 class="section-title">Blink</h2>
                 <div class="section-content">
-                    <h3>Step 1: Environment Setup</h3>
-                    <p>First, I installed the Arduino board package for Artemis Nano and configured the serial port settings. The board was recognized on <code>COM4</code> at 115200 baud rate.</p>
-
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>The following is a video that showcases the Artemis board flashing its blue LED light:</p>
+<div class="video-container">
+    <iframe 
+        src="https://www.youtube.com/embed/sFqqFRt7icU" 
+        title="Artemis Board Blinking LED" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+    </iframe>
+</div>
+                    <p class="image-caption">Video 1: artemis blinking</p>
                     <h3>Step 2: Bluetooth Pairing</h3>
                     <p>The HM-10 Bluetooth module was wired to the Artemis Nano using UART pins. I used the following pin configuration:</p>
 
@@ -626,13 +631,13 @@ bt.close()</pre>
 
             <!-- Conclusion Section -->
             <section class="content-section animate-on-scroll">
-                <h2 class="section-title">Conclusion</h2>
+                <h2 class="section-title">Discussion</h2>
                 <div class="section-content">
                     <p>Lab 1 successfully established the hardware and software foundation for the Fast Robots course. The Bluetooth communication protocol and basic motor control are now functional and ready for extension in subsequent labs.</p>
                     
                     <div class="highlight-box">
-                        <h4>Next Steps</h4>
-                        <p>In Lab 2, I will integrate the IMU sensor for orientation tracking and implement closed-loop control for more precise movement.</p>
+                        <h4>Collaboration</h4>
+                        <p>I used Kimi to build the basic template for the website and I referred to Lucca Correia's Website for how to structure this lab report.</p>
                     </div>
                 </div>
             </section>
