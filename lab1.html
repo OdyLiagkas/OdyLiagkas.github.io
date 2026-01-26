@@ -616,7 +616,48 @@ bt.close()</pre> -->
             <section class="content-section animate-on-scroll">
                 <h2 class="section-title">BLE and Codebase</h2>
                 <div class="section-content">
-                    <p>After having created the virtual environment</p>
+                    <div class="highlight-box">
+                        <h2 class="title">Bluetooth Low Energy (BLE):</h2>
+                        <p>As per this <a href="https://docs.arduino.cc/libraries/arduinoble/">summary of Bluetooth Low Energy</a> (or BLE):</p>
+                    <ul><li>Unlike standard Bluetooth communication that based on an asynchronous serial connection (UART), 
+                        a Bluetooth LE radio acts like a community bulletin board that community-member-computers can connect to and read. 
+                        <li>Each radio acts as either the bulletin board or the reader. </li>
+                        <li><b>The Artemis board is a radio that acts as a bulletin board</b>, which is also called 'peripheral device', and it posts data for all
+                        radios in the community to read. </li>
+                        <li><b>Our computer is a radio that acts as a reader</b>, which is also called 'central device', and it reads from any of the bulletin boards (peripheral devices) that have relevant information. Central devices view the services, get the data and then move on.</li>
+                    </ul>
+                    <p>The peripheral devices can also be thought of as the servers in a client-server transaction, as they 
+                    have the information that reader-radios ask for. Similarly, central devices are the clients because they read information available from the peripherals.</p>
+                        <ul>
+                            <li>The information presented by a peripheral is structured as services, each of which is subdivided into characteristics.</li>
+                            <li>Services are identified by universally unique IDs, called UUIDs. 
+                                The ability to define services and characteristics depends on the radio used as well as its firmware. 
+                                Bluetooth LE peripherals provide services that, in turn, provide characteristics.</li>
+                        </ul>
+                        <p>There are 4 things a central device can do with a characteristic:</p>
+                        <ul>
+                            <li><code>Read</code>: ask the peripheral to send back the current value of the characteristic. Often used for characteristics that don't change very often, for example characteristics used for configuration, version numbers, etc.</li>
+                            <li><code>Write</code>: modify the value of the characteristic. Often used for things that are like commands, for example telling the peripheral to turn a motor on or off.</li>
+                            <li><code>Indicate</code> and <code>Notify</code>: ask the peripheral to continuously send updated values of the characteristic, without the central having to constantly ask for it.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                        <h2 class="title">Codebase:</h2>
+                    <div class="section-content">
+                        <p>Our codebase is the body of code that our system is comprised of.</p>
+                        <ul><li>Undisrupted communication and BLExCharacteristics (Constructors for handling different type of data provided by ArduinoBLE) transmission is achieved thanks to the UUID and Mac address of the Artemis.</li>
+                        <li>The code running on the Artemis is <code>ble_arduino.ino</code></li>
+                        <li>RobotCommand is a class defined in the synonymous header file. It is used when handling a robot command that the Artemis receives. It is a string of the format:
+                            <div class="code-block">
+                                <pre>&lt;cmd_type&gt;:&lt;value1&gt;|&lt;value2&gt;|&lt;value3&gt;|…</pre>
+                            </div>
+                        <li>To transmit strings from the Artemis to our computer we use the <code>EString</code>.</li>
+                        <li><code>enum CommandTypes</code> enumerates the variables in CommandTypes.</li>
+                        <li><code>handle_command()</code> handles commands received by our computer via switch statement to determine what action to take based on the command received</li>
+                        <li>Demo.ipynb is the jypter notebook that contains the python code which sends commands to the Artemis board.</li>    
+                    </ul>
+                    </div>
                 </div>
             </section>
 
