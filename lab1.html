@@ -16,6 +16,38 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     
     <style>
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
         /* Import base styles */
         :root {
             --primary-navy: #1a2332;
@@ -604,10 +636,12 @@ bt.close()</pre> -->
                         <li>SEND_THREE_FLOATS</li>
                         <li>GET_TIME_MILLIS</li>
                         <li>Notification Handler</li>
-                        <li>Current time getter and sender</li>
+                        <li>Effective Data Transfer</li>
                         <li>SEND_TIME_DATA</li>
                         <li>GET_TEMP_READINGS</li>
                         <li>Disscusion of differences</li>
+                        <li>Effective Data Rate and Overhead (Graduate level)</li>
+                        <li>Reliability (Graduate level)</li>
                     </ol>
                 </div>
             </section>            
@@ -619,10 +653,7 @@ bt.close()</pre> -->
                     <div class="highlight-box">
                         <h2 class="title">Bluetooth Low Energy (BLE):</h2>
                         <p>As per this <a href="https://docs.arduino.cc/libraries/arduinoble/">summary of Bluetooth Low Energy</a> (or BLE):</p>
-                    <ul><li>Unlike standard Bluetooth communication that based on an asynchronous serial connection (UART), 
-                        a Bluetooth LE radio acts like a community bulletin board that community-member-computers can connect to and read. 
-                        <li>Each radio acts as either the bulletin board or the reader. </li>
-                        <li><b>The Artemis board is a radio that acts as a bulletin board</b>, which is also called 'peripheral device', and it posts data for all
+                    <ul>                        <li><b>The Artemis board is a radio that acts as a bulletin board</b>, which is also called 'peripheral device', and it posts data for all
                         radios in the community to read. </li>
                         <li><b>Our computer is a radio that acts as a reader</b>, which is also called 'central device', and it reads from any of the bulletin boards (peripheral devices) that have relevant information. Central devices view the services, get the data and then move on.</li>
                     </ul>
@@ -633,12 +664,6 @@ bt.close()</pre> -->
                             <li>Services are identified by universally unique IDs, called UUIDs. 
                                 The ability to define services and characteristics depends on the radio used as well as its firmware. 
                                 Bluetooth LE peripherals provide services that, in turn, provide characteristics.</li>
-                        </ul>
-                        <p>There are 4 things a central device can do with a characteristic:</p>
-                        <ul>
-                            <li><code>Read</code>: ask the peripheral to send back the current value of the characteristic. Often used for characteristics that don't change very often, for example characteristics used for configuration, version numbers, etc.</li>
-                            <li><code>Write</code>: modify the value of the characteristic. Often used for things that are like commands, for example telling the peripheral to turn a motor on or off.</li>
-                            <li><code>Indicate</code> and <code>Notify</code>: ask the peripheral to continuously send updated values of the characteristic, without the central having to constantly ask for it.</li>
                         </ul>
                     </div>
                 </div>
@@ -654,8 +679,7 @@ bt.close()</pre> -->
                             </div>
                         <li>To transmit strings from the Artemis to our computer we use the <code>EString</code>.</li>
                         <li><code>enum CommandTypes</code> enumerates the variables in CommandTypes.</li>
-                        <li><code>handle_command()</code> handles commands received by our computer via switch statement to determine what action to take based on the command received</li>
-                        <li>Demo.ipynb is the jypter notebook that contains the python code which sends commands to the Artemis board.</li>    
+                        <li><code>handle_command()</code> handles commands received by our computer via switch statement to determine what action to take based on the command received.</li>
                     </ul>
                     </div>
                 </div>
@@ -676,7 +700,383 @@ bt.close()</pre> -->
                     <div class="code-block">
                         <pre>pip install numpy pyyaml colorama nest_asyncio bleak jupyterlab</pre>
                     </div>                       
-                       and started the Jupyter Server with <code>jupyter lab</code></p>
+                       and started the Jupyter Server with <code>jupyter lab</code>.</p>
+                     <p>Configured the MAC address of the Artemis and the new generated UUID (generation code shown in screenshot 6 below) in our <code>connection.yaml</code> file in our codebase.</p> 
+                     <div class="lab-image">
+                        <img src="resources/Lab1/20.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Screenshot 5: MAC address of Artemis</p>
+                     <div class="lab-image">
+                        <img src="resources/Lab1/13.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Screenshot 6: left: conection.yaml file, right: command to generate new UUID</p>
+                    <p>Additionally, in the <code>ble_arduino.ino</code> file, the following line was adjusted to reflect the aformentioned uuid: 
+                        <br><code>#define BLE_UUID_TEST_SERVICE "1f43159b-1c6b-49dc-bf06-86977e06b15d"</code></p>
+
+                        <p>The following screenshot showcases how to connect to the Artemis via Bluetooth by using the <code>get_ble_controller()</code> constructor and then the method <code>ble.connect()</code>. It also showcases the two example methods <code>.receive_float()</code> and <code>.receive_string()</code>: </p>
+                     <div class="lab-image">
+                        <img src="resources/Lab1/15.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Screenshot 7: Establishment of Bluetooth connection between Artemis and Computer and example methods to read different types of GATT characteristics</p>                
+                </div>
+            </section>
+
+            <!-- 1b1 Echo Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Echo</h2>
+                <p>Send a string value from the computer to the Artemis board using the ECHO command. The computer should then receive and print an augmented string. </p>
+                <br>
+                <p> Artemis Code:</p>
+                    <div class="code-block">
+                        <pre>        case ECHO:
+
+            char char_arr[MAX_MSG_SIZE];
+
+            // Extract the next value from the command string as a character array   
+            success = robot_cmd.get_next_value(char_arr);
+            if (!success)
+                return;
+
+            tx_estring_value.clear();
+            tx_estring_value.append("Ody's Robot says -> ");
+            tx_estring_value.append(char_arr);
+            tx_estring_value.append(" :)");
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+            Serial.println(tx_estring_value.c_str());
+            
+            break;</pre>
+            </div>
+
+                <p> Jupyter Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/ECHO.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 8: juypter code with response</p> 
+
+            </section>
+
+            <!-- 1b2 SEND_THREE_FLOATS Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">SEND_THREE_FLOATS</h2>
+                <p>Send three floats to the Artemis board using the <code>SEND_THREE_FLOATS</code> command and extract the three float values in the Arduino sketch.</p>
+                <br>
+                <p> Jupyter Code:</p>
+                    <div class="code-block">
+                        <pre>ble.send_command(CMD.SEND_THREE_FLOATS, "2.2|-6.6|1.11")</pre>
+            </div>
+
+                <p> Artemis Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/3FLOATS.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 9: Artemis code with response</p> 
+
+            </section>
+
+            <!-- 1b3 GET_TIME_MILLIS Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">GET_TIME_MILLIS</h2>
+                <p>Add a command <code>GET_TIME_MILLIS</code> which makes the robot reply write a string such as “T:123456” to the string characteristic.</p>
+                <br>
+                <p> Artemis Code:</p>
+<div class="c-code-block">
+<pre>
+<span class="keyword">case</span> <span class="type">GET_TIME_MILLIS</span>:
+    tx_estring_value.clear();
+    tx_estring_value.append(<span class="string">"T:"</span>);
+    tx_estring_value.append((<span class="type">int</span>)currentMillis);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    <span class="keyword">break</span>;
+</pre>
+</div>
+
+
+                <p> Jupyter Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/GET_MILIS.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 10: Jupyter code with response</p> 
+
+            </section>
+
+            <!-- 1b4 Notification Handler Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Notification Handler</h2>
+                <p>Setup a notification handler in Python to receive the string value from the Artemis board. In the callback function, extract the time from the string.</p>
+                <br>
+                <p> Jupyter Code:</p>
+<div class="p-code-block">
+<pre>
+<span class="keyword">def</span> notification_handler(uuid, byteArray):
+    string = ble.bytearray_to_string(byteArray)
+    <span class="builtin">print</span>(string)
+</pre>
+</div>
+
+
+
+                <p> Jupyter Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/notif.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 11: General Notification Handler</p>     
+                <div class="lab-image">
+                    <img src="resources/Lab1/time_notif.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 12: Time Extracting Notification Handler</p>         
+            </section>
+
+            <!-- 1b5 Current time getter and sender Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Effective Data Transfer</h2>
+                <p>Write a loop that gets the current time in milliseconds and sends it to your laptop to be received and processed by the notification handler. Collect these values for a few seconds and use the time stamps to determine how fast messages can be sent. What is the effective data transfer rate of this method?</p>
+                <br>
+                <p> In the following code we can see that the effective data transfer is 34 messages in 2 secconds. Since every message is 9 characters (T:1234567), it's 9 bytes. 17 messages a second equal: <b>153 bytes / second</b></p>
+                <br>
+                <p> Jupyter Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/data_transf.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 13: Jupyter code with response</p> 
+
+            </section>
+
+            <!-- 1b6 SEND_TIME_DATA Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">SEND_TIME_DATA</h2>
+                <p>Add a command <code>SEND_TIME_DATA</code> which loops an array and sends each data point as a string to your laptop to be processed.</p>
+                <br>
+                <p>The <code>SET_TIME_DATA</code> case, performs 16 loops where it takes time in milliseconds and stores them in each index of the array timestampArray. Afterwards it clears the Estring, reads each index, appends the content to the Estring, sends it to the computer and repeats for 16 repetitions total.</p><br>
+                <p> Artemis Code:</p>
+                    <div class="code-block">
+                        <pre>        case SEND_TIME_DATA:
+
+            int temp_millis; 
+            temp_millis= 0;
+    
+              if (!success) {
+                return;
+                }
+    
+            for (int i = 0; i < 16; i++){ 
+                temp_millis = millis();
+                timestampArray[i] = temp_millis;
+                }
+
+            for (int j = 0; j < 16; j++){ 
+                tx_estring_value.clear();
+                tx_estring_value.append("T: ");
+                tx_estring_value.append(timestampArray[j]);
+                tx_characteristic_string.writeValue(tx_estring_value.c_str());
+                }
+            break;</pre>
+            </div>
+
+                <p> Jupyter Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/get_time_data.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 14: Jupyter code with responses</p> 
+
+            </section>
+
+            <!-- 1b7 GET_TEMP_READINGS Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">GET_TEMP_READINGS</h2>
+                <p>Add a command <code>GET_TEMP_READINGS</code> that loops through both arrays concurrently and sends each temperature reading with a time stamp. The notification handler should parse these strings and add populate the data into two lists.</p>
+                <br>
+                <p>The case <code>GET_TEMP_READINGS</code> goes through each index of the timestamp and temperature arrays and adds values into each one. That way, the indexes are paired between the two arrays.
+                Afterwards, for each index again, the values of the temperature and timestamp array are appended in the appropriate format to the Estring and they are sent to the computer.</p>
+                <br>
+                <p> Artemis Code:</p>
+                    <div class="code-block">
+                        <pre>        case GET_TEMP_READINGS:
+            float temperature;
+            int temperature_millis; 
+            temp_millis= 0;
+    
+              if (!success) {
+                return;
+                }
+    
+            for (int i = 0; i < 16; i++){ 
+                temperature_millis = millis();
+                timestampArray[i] = temperature_millis;
+                temperature = getTemperature();
+                temperatureArray[i] = temperature;
+                }
+
+            for (int j = 0; j < 16; j++){ 
+                tx_estring_value.clear();
+                tx_estring_value.append("Temp: ");
+                tx_estring_value.append(temperatureArray[j]);
+                tx_estring_value.append(" Time: ");
+                tx_estring_value.append(timestampArray[j]);
+                tx_characteristic_string.writeValue(tx_estring_value.c_str());
+                }
+            break;</pre>
+            </div>
+
+                <p> Jupyter Code:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab1/get_temp.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 15: Jupyter code with responses</p> 
+
+            </section>
+
+            <!-- 1b8 Discussion of differences Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Discussion of differences</h2>
+                <div class="section-content">
+                    <p>Based on the output of <code>GET_TIME_MILLIS</code>, comparing it to that of <code>SEND_TIME_DATA</code> and 
+                        <code>GET_TEMP_READINGS</code> we can immediately see that the latter 2 are much faster in terms of sampling. 
+                        In those cases, the artemis immediately sends a whole batch of data with only one command being sent to it from the computer. This meanas that it can record a lot of data points quickkly and send them all together at the end.
+                    The negative side of that, however, is that the computer has to wait for the artemis to complete 
+                    the collection of all data points before receiving even the first one. As always, there are tradeoffs. 
+                    If we want faster sampling times but don't care as much about the delivery time, we'd go with the second method. 
+                    If we wanted as "real-time" data as possible to be transmitted live, we'd go with the first option 
+                    which samples more slowly.</p>
+                <p>Modifying the code like so, allows the determination of second method's data recording speed:</p>
+                    <div class="code-block">
+                        <pre>            for (int i = 0; i < 100; i++){ 
+                temp_millis = millis();
+                timestampArray[i] = temp_millis;
+                }
+
+                tx_estring_value.clear();
+                tx_estring_value.append("T1: ");
+                tx_estring_value.append(timestampArray[0]);
+                tx_estring_value.append(" T2: ");
+                tx_estring_value.append(timestampArray[99]);                
+                tx_characteristic_string.writeValue(tx_estring_value.c_str());  
+                        </pre></div>
+            <p>In the following screenshot we can see the difference between the first and one hundredth recording to be 2ms.</p>
+            
+                    </div>                
+                    <div class="lab-image">
+                    <img src="resources/Lab1/new_time_rec.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 16: Jupyter code with response</p>
+                <br>
+                <p>The amount of data we can store to send without running out of memory depends on the program's variables and the type of data we want. ASSUMING one data point is 7 characters (like GET_TIME_MILLIS without the T: part) which is equal to 7 bytes, that would mean that we could approximately send 384k/7 ~= 54,000 data points (not counting the memory the program takes up).</p>
+            </section>
+
+            <!-- 1b9 Effective Data Rate and Overhead Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Effective Data Rate and Overhead</h2>
+                <div class="section-content">
+                    <p>Send a message from the computer and receive a reply from the Artemis board. Note the respective times for each event, calculate the data rate for 5-byte replies and 120-byte replies. Do many short packets introduce a lot of overhead? Do larger replies help to reduce overhead?</p>
+                <p>In the beginning, I wanted to see how long it takes for Artemis to send a 5 Byte and 120 Byte Estring to the computer. So I created the following two cases to see the time it takes for the message to get sent:</p>
+                <p>Through these, I learned that the time it takes to send 5 Bytes and 120 Bytes of data is 133 and 224 miscroseconds respectively.</p>
+                                    <div class="code-block">
+                        <pre>        case GET_DATA_SPEED_5B:
+            tx_estring_value.clear();
+            tx_estring_value.append("ccccc");
+            before_micros = micros();
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            after_micros = micros();
+            total_micros = after_micros - before_micros;
+            tx_estring_value.clear();
+            tx_estring_value.append("The time it took to send 5 bytes is: "); 
+            tx_estring_value.append((int)total_micros);
+            tx_estring_value.append(" microseconds."); 
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            break;
+
+        case GET_DATA_SPEED_120B:
+            tx_estring_value.clear();
+            tx_estring_value.append("cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc");
+            before_micros = micros();
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            after_micros = micros();
+            total_micros = after_micros - before_micros;
+            tx_estring_value.clear();
+            tx_estring_value.append("The time it took to send 120 bytes is: "); 
+            tx_estring_value.append((int)total_micros);
+            tx_estring_value.append(" microseconds."); 
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            break;
+                        </pre></div>
+                        
+            <p>To calculate the round-trip I make the following case which allows to send a number of messages back to back with a set sizeL</p>            
+                <div class="code-block"><pre>        case GET_BYTE_SPEED:
+            int bytes;
+            int num_of_packets;
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(bytes);
+            if (!success)
+                return;
+
+            // Extract the next value from the command string as an integer
+            success = robot_cmd.get_next_value(num_of_packets);
+            if (!success)
+                return;
+
+            tx_estring_value.clear();
+
+            for (int i = 0; i < bytes; i++) {
+                responseArray[i] = 'c';
+            }
+
+            for(int j=0; j < num_of_packets; j++){
+            tx_estring_value.append(responseArray);
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            tx_estring_value.clear();
+            }
+            
+            break;
+
+                </pre></div>
+                <p>I also created the following Notification Handler:</p>
+            <div class="code-block">
+                <pre>start = 0
+dt = 0
+def data_notification_handler(uuid, byteArray):
+    string = ble.bytearray_to_string(byteArray)
+    end = time.time()
+    dt = end-start
+    #print(string)
+    print(dt)</pre>
+            </div> 
+            <p>Then, I ran the GET_BYTE_SPEED command 10 times for the following sizes: 5,10,20,40,60,80,100,120 and took the average round-trip time as well as data rate. The results are plotted below:</p>   
+                <div class="lab-image">
+                    <img src="resources/Lab1/data_rate.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Plots 1,2</p>
+                </div>
+            <p>These results tell us that the latency remained relatively the same in all of the cases, which meant that the bigger sized messages had a much greater data rate. This means that many short packets do introduce a lot of overhead and larger replied help to reduce it.</p>
+            </section>
+
+            <!-- 1b10 Reliability Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Reliability</h2>
+                <div class="section-content">
+                    <p>What happens when you send data at a higher rate from the robot to the computer? Does the computer read all the data published (without missing anything) from the Artemis board?</p>
+                <p>To test this out I made the following notification handler:</p>
+                <div class="code-block">
+                    <pre>received_strings = []
+def rapid_data_notification_handler(uuid, byteArray):
+    string = ble.bytearray_to_string(byteArray)
+    received_strings.append(string)</pre>
+                </div>
+                <p>In addition to this, I also made a new case for the Artemis that would rapidly send 100 Estrings to the computer:</p>
+                <div class="code-block"><pre>        case GET_RAPID_INFO:
+            tx_estring_value.clear();
+
+            for(int i=0;i < 100;i++){
+            tx_estring_value.append(i);
+            tx_characteristic_string.writeValue(tx_estring_value.c_str());
+            tx_estring_value.clear();                            
+            }            
+
+            break;</pre></div>
+            <p>From the following screenshot, we can clearly see that no messages were lost, even though there was a delay in receiving them. This indicates that there is some sort of Queue inside of the notification handler that just pops the oldest element at its faster speed.</p>
+                    <div class="lab-image">
+                    <img src="resources/Lab1/rapid.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Screenshot 17: All messages arrived to computer</p>
                 </div>
             </section>
 
@@ -684,11 +1084,14 @@ bt.close()</pre> -->
             <section class="content-section animate-on-scroll">
                 <h2 class="section-title">Discussion</h2>
                 <div class="section-content">
-                    <p>Lab 1 successfully established the hardware and software foundation for the Fast Robots course. The Bluetooth communication protocol and basic motor control are now functional and ready for extension in subsequent labs.</p>
+                    <p>Lab 1 successfully established the hardware and software foundation for the Fast Robots labs. 
+                        The Bluetooth communication protocol is now functional and ready for extension in subsequent labs.</p>
+                        <p>What challenged me the most was figuring out how to minimize the round-trip time for the Effective Data Rate and Overhead part.</p>
+                        <p>I really like the incorporation of the "truest" time difference that I measured, which was the time it took the Artemis (and only the Artemis) to send the 5B vs 120B messages.</p>
                     
                     <div class="highlight-box">
                         <h4>Collaboration</h4>
-                        <p>I used Kimi to build the basic template for the website and I referred to Lucca Correia's Website for how to structure this lab report.</p>
+                        <p>I used Kimi to build the basic template for the website and I referred to Lucca Correia's Website for how to structure this lab report. I also looked at Aidan McNay's and Ben Liao's websites to see how I should upload the graduate level answers.</p>
                     </div>
                 </div>
             </section>
