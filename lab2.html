@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 2 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 2: Inertial Measurement Unit.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<!--   START OF CODE -->
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 2: Inertial Measurement Unit</h1>
+            
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Objectives</h2>
+                <div class="section-content">
+                    <ul>
+                        <li>Add the IMU to the robot</li>
+                        <li>Start running the Artemis and sensors from a battery</li>
+                        <li>Record a stunt with the RC robot</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Lab 2 Tasks</h2>
+                <div class="section-content">
+                    <ol>
+                        <li>Setup the IMU</li>
+                        <li>Accelerometer</li>
+                        <li>Gyroscope</li>
+                        <li>Sample Data</li>
+                        <li>RC Robot Stunt</li>
+                    </ol>
+                </div>
+            </section>            
+
+            <!-- Deliverables Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Setup the IMU</h2>
+                <div class="section-content">
+                    <div class="highlight-box">
+                        
+                        <p>I installed the <code>SparkFun 9DOF IMU Breakout_ICM 20948_Arduino Library</code> from the Library Manager of the arduino IDE and
+connected the IMU to the Artemis via the QWIIC connectors. Afterwards, I ran the <code>Example1_Basics</code> from that library.</p>
+                    <ul> <li>In that file there was the following definition: <b>AD0_VAL</b>, which, as noted on the file, is the value of the last bit of the I2C address. </li>
+                        <li><b>Its value should be 1</b>. The only scenario in which it should be 0, is when the ADR jumper is soldered (or connected in another way) closed. 
+                            This would allow us to have mupltiple IMUs. Because our ADR jumper is open, our AD0_val should have the default value of 1.</li>
+                    </ul></div>
+                    <p>Based on the outputs of the following videos, we can see that the IMU works properly in terms of its accelerometer and gyroscope.
+                        For both sensors, there are 3 outputs, one for each axis (X,Y,Z). The accelerometer outputs mg, thousands of Earth gravity, 
+                        while the gyroscope outputs DPS, which is Degrees Per Second, a.k.a. Angular Velocity.</p>
+                    
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/BF_Uff9vy6Y" 
+                            title="Serial Plotter output of Example1_Basics" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 1: IMU serial plotter output</p>
+
+                    
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/NgXZiGiwmMk" 
+                            title="Serial Print output of Example1_Basics" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 2: IMU serial print output</p>
+                <br><br>
+
+                        <h2 class="title">Start-up indication:</h2>
+                <div class="section-content">
+                        <p>In order to know that the board is running, I made it so that the Artemis' LED blinks thrice on start-up. This is showcased in the following video:</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/PO9g9yzfEMA" 
+                            title="LED startup indication" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 3: LED blink start-up indication</p>
+
+                </div>
+            </section>
+
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Accelerometer</h2>
+                <div class="section-content">
+                        
+                        <p>In order to convert the accelerometer data into pitch and roll, I used the following equations presented in class:</p>
+                    <div class="highlight-box">
+                        pitch = θ = atan2(a_x, a_z) * 180 / π <br>
+                        roll = φ = atan2(a_y, a_z) * 180 / π
+                    </div>
+                        <p>The multiplication by 180 and division by pi, is simply to convert radians into degrees.</p>
+                        <p>The following video showcases the output of the accelerometer for pitch and roll in degrees:</p>
+
+                    
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/4KkoL5rdKgk" 
+                            title="Output of pitch and roll in degrees" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 4: Accelerometer Pitch and Roll output in degrees</p>
+                <p>Based on the previous videos, and other testing conducted during the lab, I concluded that the accelerometer is accurate enough,
+                    to the point where a two-point callibration is not necessary. After all, it is known that our robot cars will not have extremely accurate sensor readings in general.
+                </p><br>
+
+                <h2 class="title">Frequency Spectrum Data Analysis:</h2>
+                        <p>The artemis code for data collection and sharing with the computer is the following:</p>
+<div class="code-block">
+<pre>case GET_ACC_DATA:
+    
+    float accelMicros;
+    float theta; //pitch
+    float phi; //roll
+
+     accelMicros = 0;
+     theta = 0; //pitch
+     phi = 0; //roll
+
+    if (!success) {return;}
+
+    // Collection of 2500 data points
+    for (int i = 0; i < 2500; i++) { 
+    while (!myICM.dataReady()) {}
+    myICM.getAGMT();
+
+    accelMicros = micros();
+    theta = atan2(myICM.accX(), myICM.accZ()) * 180 / M_PI; 
+    phi  = atan2(myICM.accY(), myICM.accZ()) * 180 / M_PI; 
+    
+    timestamps[i] = accelMicros;
+    thetas[i] = theta;
+    phis[i] = phi;
+}
+
+// send one message to computer for each index of the data arrays
+for (int j = 0; j < 2500; j++) { 
+    tx_estring_value.clear();
+    tx_estring_value.append("T:");
+    tx_estring_value.append(timestamps[j]);
+    tx_estring_value.append(",");
+    tx_estring_value.append("P:");
+    tx_estring_value.append(thetas[j]);
+    tx_estring_value.append(",");
+    tx_estring_value.append("R:");
+    tx_estring_value.append(phis[j]);
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+}
+            break;</pre>
+                    </div>
+
+                <p>The previous code sends 2500 data points to the computer where each data point contains Time, Pitch and Roll. 
+                    Then, the computer receives it through the following python handler function which also saves it to the computer as a CSV file.
+                </p>
+<div class="code-block">
+<pre>def accelerometer_handler(uuid, byteArray):
+    string = ble.bytearray_to_string(byteArray).strip()
+    t, p, r = string.split(",")
+    time = float(t[2:])  
+    pitch = float(p[2:])   
+    roll = float(r[2:])  
+    #print(f"{time_value},{pitch},{roll}\n")
+    with open("accelerometer_data.csv", "a+") as file:
+        file.seek(0)
+        if file.read(1) == "":
+            file.write("Time,Pitch,Roll\n")
+        file.write(f"{time},{pitch},{roll}\n")</pre>
+                    </div>
+                    <br><br><p>The data isn't as noisy as I had expected. Our IMU has a "built-in" low pass filter. However, in the future, the IMU is going to be inside the robot's body right next to the motors.
+                        This, in addition to the fact that there are probably going to be other sources of noise, suggested I should implement a low-pass filter.
+                    </p>
+                    <p>Examining my original data, I saw that the "real" data were under 5 Hz above which there was noise. </p>
+                    <p>My total sampling time was 7020988 microseconds = 7.020988 seconds and I took 2500 samples. This means my <b>Sampling Rate was 356Hz</b> or <b>Sampling Period of ~0.0028 s</b>.
+                    For a low-pass filter with a cut-off frequency of 5 Hz, <b>RC = 1/(2π5) = ~0.0318 s</b>. From these, we can derive <b>α = 0.0028/(0.0028+0.0318) = ~0.081</b></p>
+                    <p>The following 4 plots are with me hitting the lab counter (a bit unsuccessfully I would add as I barely managed to make the IMU viberate). <b>Note that the pitch in the Time Domain is negative because of how I had left the IMU to rest on the counter.</b>
+                        You can see this in <b>Video 3</b>. </p> <p>These plots show the unfiltered (raw) and filtered (with the 5Hz cutoff Low-pass filter) data, both in the time and frequency domain.
+                    </p>
+
+                <div class="lab-image">
+                    <img src="resources/Lab2/pitch_time_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 1: Pitch Time Domain</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/pitch_frequency_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 2: Pitch Frequency Domain</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/roll_time_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 3: Roll Time Domain</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/roll_frequency_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 4: Roll Frequency Domain</p>
+                
+            <br><br>
+            <p>The following figures is when I was moving the IMU with my hand:</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/moved_pitch_time_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 5: Pitch Time Domain while moving IMU</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/moved_pitch_frequency_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 6: Pitch Frequency Domain while moving IMU</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/moved_roll_time_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 7: Roll Time Domain while moving IMU</p>
+                <div class="lab-image">
+                    <img src="resources/Lab2/moved_roll_frequency_domain.png" alt="Lab 1">
+                </div>
+                <p class="image-caption">Figure 8: Roll Frequency Domain while moving IMU</p>
+                <br><br><p>Though there is still some noise present after implementing the low-pass filter, 
+                the output of the lp filter was vastly improved compared to the raw data.</p>
+            </section>
+
+
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Gyroscope</h2>
+                <div class="section-content">
+                        
+                    <p>In order to convert the gyroscope data into pitch and roll, I used the following equations presented in class:</p>
+                    <div class="highlight-box">
+                        pitch = θ = θ +  gyro_reading_Y * Δt <br>
+                        roll = φ = φ +  gyro_reading_X * Δt <br>
+                        yaw = ψ = ψ +  gyro_reading_Z * Δt 
+                    </div>
+
+                    <p>With these equations I got the following results:</p><br>
+                
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_pitch_time_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 9: Pitch Time Domain</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_pitch_freq_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 10: Pitch Frequency Domain</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_roll_time_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 11: Roll Time Domain</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_roll_freq_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 12: Roll Frequency Domain</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_yaw_time_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 13: Yaw Time Domain</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_yaw_freq_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 14: Yaw Frequency Domain</p>
+                
+                    <div class="highlight-box">
+                        <h4>The pitch is negative compared to the accelerometer!</h4>
+                        <p>After making the change the results are the following:</p>
+                    </div>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_correct_pitch_time_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 15: Pitch Time Domain (corrected)</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_correct_pitch_freq_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 16: Pitch Frequency Domain (corrected)</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_correct_roll_time_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 17: Roll Time Domain (corrected)</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_correct_roll_freq_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 18: Roll Frequency Domain (corrected)</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_correct_yaw_time_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 19: Yaw Time Domain (corrected)</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/both_correct_yaw_freq_domain.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 20: Yaw Frequency Domain (corrected)</p>
+                
+                    <p>The two following figures are without and with 4ms delay respectively. Our original sampling rate was ~2000 microseconds.
+                        4 millisecond delay ==> 4000 microsecond delay ==> 6000 microseconds total sampling time ==> tripling the sampling time.
+                        The results from the following figures show that adding a delay has an effect on the amount of drift present. We can observe that for the same amount 
+                        of time that has passed, more drift has been introduced:
+                    </p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/gyro_0delay.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 21: No delay</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/gyro_4delay.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 22: 4 ms delay</p>
+
+                    <h2 class="title">Complementary Filter:</h2>
+                    
+                    <div class="highlight-box">
+                        <h4>Equations:</h4>
+                        <p>θ = (θ + θ_g)(1 − α) + θ_a*α<br>
+                        φ = (φ + φ_g)(1 − α) + φ_a*α<br>
+                    ψ = ψ_g</p>
+                    </div>
+                    <p>From the following plots with alpha=5% and alpha=10% respectively, we can see that
+                        the difference is miniscule but a=5% produces a slightly better result.
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab2/combined_data_a5.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 23: alpha = 5%</p>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab2/combined_data_a10.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 24: alpha = 10%</p>                
+                    
+                    <p>Finally, here we can see the range and accuracy of the complementary filter with a=5%. Note that I was holding it without keeping my hand stable which produced quick vibrations. We can also observe that the drift here is negligible.</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab2/complementary_filter_range.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 25: working range, accuracy lack of susceptibility to drift or quick vibrations</p>  
+
+                </div> 
+            </section>  
+
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Sample Data</h2>
+                <div class="section-content">
+                        
+                        <p>Sampling Data Points via the loop is slightly slower at 3554 microseconds per data point, while before, with the same complementary filter, it was 3470 microseconds. This is equivalent to ~281.4 measurements per second.</p>
+                    <div class="highlight-box">
+                        My loop is shown below and its logic is simple. If there are available data, increase the # of data points (while also sampling) and loop iterations. 
+                        <br>If there are no available data, the data collection is skipped and only the loop iperations variable is incremented by one.
+</div>
+                        <div class="code-block">
+<pre>void loop(){
+    // Listen for connections
+    BLEDevice central = BLE.central();
+
+    // If a central is connected to the peripheral
+    if (central) {
+        Serial.print("Connected to: ");
+        Serial.println(central.address());
+
+        // While central is connected
+        while (central.connected()) {
+            // Send data
+            write_data();
+
+            // Read data
+            read_data();
+
+if( collecting_data && (data_points < 2500)){
+  loop_iterations++;
+  
+  if(myICM.dataReady()){
+
+  myICM.getAGMT();
+        Now = micros();
+        dT = (Now - T0) / 1000000.0;
+        T0 = Now;
+
+        // Accelerometer angles
+        Acc_pitch = atan2(myICM.accX(), myICM.accZ()) * 180.0 / M_PI; 
+        Acc_roll = atan2(myICM.accY(), myICM.accZ()) * 180.0 / M_PI; 
+
+        float Gyro_increment_pitch = -myICM.gyrY() * dT;  // minus needed
+        float Gyro_increment_roll = myICM.gyrX() * dT;   // minus not needed
+        
+        Comp_pitch = (1.0 - alphaCont) * (Comp_pitch + Gyro_increment_pitch) + alphaCont * Acc_pitch;
+        Comp_roll = (1.0 - alphaCont) * (Comp_roll + Gyro_increment_roll) + alphaCont * Acc_roll;
+        
+        // Yaw: gyro only
+        Gyro_yaw += myICM.gyrZ() * dT;
+
+        timestamps[data_points] = Now;
+        pitchs[data_points] = Comp_pitch;
+        rolls[data_points] = Comp_roll;
+        yaws[data_points] = Gyro_yaw;
+
+  data_points++;
+}}}
+        Serial.println("Disconnected");
+}}</pre>
+        </div>
+            <p> and these as my flag setter commands for the Artemis:</p>
+<div class="code-block">
+<pre>case START_COLLECTING_DATA:
+    data_points = 0;
+    loop_iterations =0;
+    T0=micros();
+    Gyro_yaw = 0;
+    
+
+   collecting_data = true;
+   break;
+
+case STOP_COLLECTING_DATA:
+   collecting_data = false;
+    for (int j = 0; j < data_points; j++) { 
+        tx_estring_value.clear();
+        tx_estring_value.append("T:");
+        tx_estring_value.append(timestamps[j]);
+        tx_estring_value.append(",P:");
+        tx_estring_value.append(pitchs[j]);
+        tx_estring_value.append(",R:");
+        tx_estring_value.append(rolls[j]);
+        tx_estring_value.append(",Y:");
+        tx_estring_value.append(yaws[j]);
+        tx_characteristic_string.writeValue(tx_estring_value.c_str());
+    }   
+    Serial.print("Completed Loop Iterations: ");
+    Serial.print(loop_iterations);
+    Serial.print(" and Collected Data Points: ");
+    Serial.println(data_points);
+   break;</pre>
+        </div>
+                    </div>
+                        <p>After leaving the flag set to true and waiting for the maximum data points to get collected (2500), I sent the command to stop the data collection and the Artemis printed that the amount of loop iterations and data points sampled where the same at 2500.<br>
+                        This means that there were always available data when it was time to sample data points. As a conclusion, the main loop on the Artemis does <b>NOT</b> run faster than the IMU produces new values.</p>
+              <p>As far as the <b>data storage</b> is concerned, I kept my original idea where I had different arrays for each data type (pitch, roll, yaw) and different ones for each origin (accel, gyro). However, for the complementary filter I only saved the final . This makes it much easier to keep track of the different data points as they have the same index in the different arrays.
+                It also allows me to be more flexible if I ever want to remove one of the arrays from sending to the computer or editting it.
+              </p>
+              <p>For me, the best data type to store my data is <code>float</code> as it is only 4B. This means that for a Time, Pitch, Roll, Yaw data point, I need 16B.</p>  
+              <p>Assuming 350kB free of the total of 384kB of memory (as we will never have the entire RAM free), we have 358,400B. Divided by 16B (size of one data point), we have a total of 22,400 measurements.
+                Assuming a sampling rate of 281.4 measurements per second, <b>we can sample ~ 79.6 seconds of data</b>.
+              </p>
+            </section>
+
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">RC Robot Stunt</h2>
+                <div class="section-content">
+                    <p>My car's name is Zeus. No, I did not name it myself. It is pronounced Zefs, just like Odyssefs.</p>
+                    <p>After experiencing the car, I can tell it slips a lot, it is very unstable and it doesn't turn well. Also it can flip when stopping after going fast in a line. I believe the turning aspect will be much better after Zeus has successfully transisioned into a proper robot.</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/FQhvedgC5G8" 
+                            title="Output of pitch and roll in degrees" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 5: RC Robot 1st Stunt</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/ztINTEmMLBo" 
+                            title="Output of pitch and roll in degrees" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 6: RC Robot 2nd Stunt</p>
+                </div>
+            </section>
+
+            <!-- Discussion Section -->
+            <section class="content-section animate-on-scroll">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+                    <p>Lab 2 successfully integrated the IMU to the Artemis and utilized the accelerometer and gyroscope it has to collect and send data to the computer. 
+                        The data acquisition is set up to send data points to the computer and ready for extension in subsequent labs.</p>
+                        <p>What challenged me the most was the lack of time to do everything sufficiently.</p>
+                        <p>I really like the way I have made the Artemis print the loop iterations and collected data points to see whether the loop runs faster than the IMU readies data.</p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        <p>I used Kimi to debug formatting for the website, chatGPT for the plots and I referred to Lucca Correia's Website for how to structure this lab report. I also looked at Aidan McNay's website to see example plotting and document structure.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
+

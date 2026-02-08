@@ -161,13 +161,14 @@
             text-align: center;
         }
 
-        /* Education Cards */
-        .education-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
+        /* Education Cards */  /* repeat(auto-fit, minmax(350px, 1fr)); */
+.education-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2em; /* a bit bigger spacing */
+    margin-bottom: 1rem;
+}
+
 
         .education-card {
             background: white;
@@ -194,18 +195,22 @@
             font-size: 1.3rem;
             color: var(--primary-navy);
             margin-bottom: 0.5rem;
+             white-space: nowrap; /* prevents line break */
         }
 
-        .education-date {
-            color: var(--secondary-copper);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+.education-date {
+    color: var(--secondary-copper);
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap; /* prevents line break */
+}
+
 
         .education-location {
             color: var(--accent-sage);
             font-weight: 500;
             margin-bottom: 1rem;
+             white-space: nowrap; /* prevents line break */
         }
 
         .education-details {
@@ -460,7 +465,7 @@
                     with a strong interdisciplinary background spanning life sciences and 
                     engineering, computer science and AI, as well as business and management. 
                     This foundation has been developed through my academic and professional 
-                    experiences from high school to the present (Jan 2026).
+                    experiences from high school to the present (Feb 2026).
                 </p>
             </div>
         </section>
@@ -474,15 +479,17 @@
                         <div class="education-header">
                             <div>
                                 <h3 class="education-title">Master of Engineering in Biomedical Engineering</h3>
-                                <p class="education-location">Cornell University, Duffield College of Engineering</p>
+                                <p class="education-location">Cornell University, Duffield College of Engineering, <span class="education-date">2025 - Present</span></p>
+                                <!--<span class="education-date">2025 - Present</span>-->
                             </div>
-                            <span class="education-date">2025 - Present</span>
+                            <!--<span class="education-date">2025 - Present</span>-->
                         </div>
                         <ul class="education-details">
                             <li>Blend of engineering and science expertise with leadership</li>
                             <li>Fulbright Graduate Student Scholarship</li>
                             <li>Michael C. Soteriades '41 Scholarship</li>
-                            <li>Design Project: Tissue Tensiometer for Total Knee Arthroplasty</li>
+                            <li>Professional Design Project: Tissue Tensiometer for Total Knee Arthroplasty</li>
+                            <li>Consulting Capstone Project in Supply Chain & Operations with Corning Inc.</li>
                             <li>STEM Classes: Soft Tissue Biomechanics, Robotics, Bio-robotics, Fast Autonomous Robots, Circuits/Signals/Sensors</li>
                             <li>MBA Classes: Management of Technology & Innovation, Managerial Decision Making, Management Consulting, Experience in Strategic Operations</li>
                         </ul>
@@ -492,9 +499,9 @@
                         <div class="education-header">
                             <div>
                                 <h3 class="education-title">Computer Science Bridge Program</h3>
-                                <p class="education-location">New York University, Tandon School of Engineering</p>
+                                <p class="education-location">New York University, Tandon School of Engineering, <span class="education-date">2024 - 2025</span></p>
                             </div>
-                            <span class="education-date">2024 - 2025</span>
+                            
                         </div>
                         <ul class="education-details">
                             <li>Awarded with distinction</li>
@@ -510,9 +517,9 @@
                         <div class="education-header">
                             <div>
                                 <h3 class="education-title">Bachelor of Science in Biology</h3>
-                                <p class="education-location">National and Kapodistrian University of Athens</p>
+                                <p class="education-location">National and Kapodistrian University of Athens,   <span class="education-date">2019 - 2023</span></p>
                             </div>
-                            <span class="education-date">2019 - 2023</span>
+                            
                         </div>
                         <ul class="education-details">
                             <li>GPA: 8.09/10</li>
@@ -527,9 +534,9 @@
                         <div class="education-header">
                             <div>
                                 <h3 class="education-title">High School Diploma</h3>
-                                <p class="education-location">Hellenic American Educational Foundation (Athens College)</p>
+                                <p class="education-location">Athens College - HAEF, <span class="education-date">2016 - 2019</span></p>
                             </div>
-                            <span class="education-date">2016 - 2019</span>
+                            
                         </div>
                         <ul class="education-details">
                             <li>Apolytirion GPA: 19.7/20 with honors</li>
@@ -560,22 +567,23 @@
                         Developing novel Tissue Tensiometer that incorporates patellar tension for use during Total Knee Arthroplasty using the Stanford Biodesign Innovation Process.
                     </p>
                     <ul class="experience-highlights">
+                        <li>Leading an interdisciplinary team of 4 people, coordinating team activities</li>
                         <li>Gaining proficiency in 6-DoF Robot Arm Biomechanical Testing and CAD Modeling</li>
-                        <li>Collaborating with Hospital for Special Surgery (HSS - New York) surgeons and engineers-advisors</li>
                         <li>Advancing skills in 3D Scanning, 3D Printing, Soldering and Microelectronics</li>
+                        <li>Collaborating with Hospital for Special Surgery (HSS - New York) surgeons and engineers-advisors</li>
                     </ul>
                 </div>
 
                 <div class="experience-item">
                     <div class="experience-header">
                         <div>
-                            <h3 class="experience-title">Supply Chain and Operations Consultant Intern</h3>
-                            <p class="experience-company">Cornell SC Johnson College of Business</p>
+                            <h3 class="experience-title">Supply Chain and Operations Consulting Intern</h3>
+                            <p class="experience-company">Cornell Johnson Graduate School of Management</p>
                         </div>
                         <span class="experience-date">Jan 2026 - May 2026</span>
                     </div>
                     <p class="experience-description">
-                        Planning and executing a real-world consulting project in supply chain & operations for Bristol Myers Squibb as a member of a team of 4 people.
+                        Planning and executing a real-world consulting project in supply chain & operations for Corning Inc. as a member of a team of 4 people.
                     </p>
                     <ul class="experience-highlights">
                         <li>Semester-long consulting capstone project in supply chain and operations</li>
@@ -585,7 +593,7 @@
                 <div class="experience-item">
                     <div class="experience-header">
                         <div>
-                            <h3 class="experience-title">Operations Intern</h3>
+                            <h3 class="experience-title">Operations and Product Development Engineer</h3>
                             <p class="experience-company">The Period Box, Cornell eLab Accelerator</p>
                         </div>
                         <span class="experience-date">Dec 2025 - Present</span>
@@ -594,8 +602,9 @@
                         Active role in daily operations, evaluation of tools & platforms, internal and external processes to prepare for an MVP launch in March of 2026.
                     </p>
                     <ul class="experience-highlights">
+                        <li>Developed and deployed a full-stack website from concept to production</li>
+                        <li>Ongoing website maintenance, shipping new features and improvements</li>
                         <li>Mapping full product and operations lifecycle </li>
-                        <li>Developing front and back end of website</li>
                         <li>Determining MVP volume forecasts and dependencies for launch </li>
                     </ul>
                 </div>
