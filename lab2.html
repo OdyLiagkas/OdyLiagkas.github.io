@@ -570,11 +570,9 @@ for (int j = 0; j < 2500; j++) {
     tx_estring_value.clear();
     tx_estring_value.append("T:");
     tx_estring_value.append(timestamps[j]);
-    tx_estring_value.append(",");
-    tx_estring_value.append("P:");
+    tx_estring_value.append(",P:");
     tx_estring_value.append(thetas[j]);
-    tx_estring_value.append(",");
-    tx_estring_value.append("R:");
+    tx_estring_value.append(",R:");
     tx_estring_value.append(phis[j]);
     tx_characteristic_string.writeValue(tx_estring_value.c_str());
 }
