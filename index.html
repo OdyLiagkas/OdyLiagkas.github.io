@@ -596,20 +596,106 @@
 <section class="research-preview animate-on-scroll">
     <div class="container">
         <div class="research-grid">
-            <div class="research-card" style="display: flex; flex-direction: column; align-items: center; padding: 0;">
-                <iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FCornellEngineeringMEng%2Fposts%2Fpfbid021b2VhHNm6DAAm3hKihADhbqrSo77i4xNPUxFodVmBZsfrjGGsEFVcitagLTRGUC7l&show_text=true&width=500" 
-                        width="500" 
-                        height="750" 
-                        style="border:none;overflow:hidden;max-width:100%;" 
-                        scrolling="no" 
-                        frameborder="0" 
-                        allowfullscreen="true" 
-                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-                </iframe>
+            
+            <!-- LinkedIn Post Card -->
+            <div class="research-card linkedin-embed">
+                <div class="linkedin-header">
+                    <div class="linkedin-meta">
+                        <h4>Cornell Master of Engineering Programs</h4>
+                    </div>
+                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" class="linkedin-icon">
+                </div>
+                
+                <div class="linkedin-content">
+                    <p>Student Spotlight</p>
+                </div>
+                
+                <!-- Images side by side -->
+                <div class="linkedin-images">
+                    <img src="resources/linkedin-post.jpg" alt="Odyssefs in lab" class="linkedin-image">
+                    <img src="resources/linkedin-post-2.jpg" alt="Odyssefs in lab" class="linkedin-image">
+                </div>
+                
+                <a href="https://www.linkedin.com/posts/cornellmeng_student-spotlight-odyssefs-liagkas-program-activity-7427018568682176512-aPdF" 
+                   target="_blank" 
+                   class="linkedin-link">
+                    View on LinkedIn →
+                </a>
             </div>
+
         </div>
     </div>
 </section>
+
+<style>
+.linkedin-images {
+    display: flex;
+    gap: 0.5rem; /* Space between images */
+    padding: 0 1rem;
+}
+
+.linkedin-image {
+    width: 50%; /* Each image takes half the width */
+    height: auto;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Keep your existing styles */
+.linkedin-embed {
+    padding: 0;
+    overflow: hidden;
+}
+
+.linkedin-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.linkedin-meta h4 {
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-charcoal);
+    margin: 0;
+}
+
+.linkedin-icon {
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+}
+
+.linkedin-content {
+    padding: 1rem;
+    font-size: 0.95rem;
+}
+
+.linkedin-content p {
+    margin: 0;
+    font-weight: 500;
+}
+
+.linkedin-link {
+    display: block;
+    padding: 1rem;
+    text-align: center;
+    color: var(--secondary-copper);
+    text-decoration: none;
+    font-weight: 600;
+    border-top: 1px solid #e0e0e0;
+    transition: var(--transition-smooth);
+}
+
+.linkedin-link:hover {
+    background: #f5f5f5;
+    color: var(--primary-navy);
+}
+</style>
+</style>
     <!-- Research Preview -->
     <section class="research-preview animate-on-scroll">
         <div class="container">
