@@ -60,6 +60,7 @@
             z-index: 1000;
             padding: 1rem 0;
             transition: var(--transition-smooth);
+            height: 70px; /* Fixed height for calculations */
         }
 
         .nav-container {
@@ -78,19 +79,21 @@
             color: var(--text-light);
             text-decoration: none;
         }
-        .profile-container {
-    text-align: center;
-    margin: 20px 0;
-}
 
-.profile-photo {
-    width: 150px;        /* Adjust size as needed */
-    height: 150px;       /* Keep equal for perfect circle */
-    border-radius: 50%;  /* Creates the circular shape */
-    object-fit: cover;   /* Ensures photo fills the circle nicely */
-    border: 3px solid #fff;  /* Optional: white border */
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);  /* Optional: subtle shadow */
-}
+        .profile-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .profile-photo {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
         .nav-links {
             display: flex;
             list-style: none;
@@ -126,36 +129,39 @@
             width: 100%;
         }
 
-        /* Hero Section */
+        /* Hero Section - FIXED: No more cropping */
         .hero {
             position: relative;
-            height: 100vh;
+            min-height: 100vh; /* Changed from height to min-height */
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
             overflow: hidden;
+            padding-top: 70px; /* Account for fixed navbar */
+            padding-bottom: 2rem;
         }
 
         .hero-background {
             position: absolute;
-            top: 0;
+            top: 70px; /* Start below navbar */
             left: 0;
             width: 100%;
-            height: 100%;
+            height: calc(100% - 70px); /* Adjust height */
             background-image: url('./resources/hero-biomedical.jpg');
-            background-size: cover;
+            background-size: cover; /* Keep cover but adjust container */
             background-position: center;
+            background-repeat: no-repeat;
             opacity: 0.3;
             z-index: 1;
         }
 
         .hero-canvas {
             position: absolute;
-            top: 0;
+            top: 70px;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: calc(100% - 70px);
             z-index: 2;
         }
 
@@ -165,7 +171,8 @@
             text-align: center;
             color: var(--text-light);
             max-width: 800px;
-            padding: 0 2rem;
+            padding: 2rem;
+            margin-top: 1rem; /* Additional spacing */
         }
 
         .hero-title {
@@ -202,16 +209,18 @@
             font-weight: 600;
             transition: var(--transition-smooth);
             box-shadow: var(--shadow-medium);
+            margin: 0.5rem;
         }
-.cta-button-secondary {
-    background-color: #a92b08;  /* Green - change to any color you want */
-    /* Or try: #6c757d (gray), #dc3545 (red), #ffc107 (yellow), etc. */
-}
+
+        .cta-button-secondary {
+            background-color: #a92b08;
+        }
 
         .cta-button:hover {
             transform: translateY(-1px);
             box-shadow: 0 12px 40px rgba(193, 120, 23, 0.3);
         }
+
 
         /* Highlights Section */
         .highlights {
@@ -461,7 +470,7 @@
         }
 
         .footer-links {
-            display: flex;
+            display: display;
             justify-content: center;
             gap: 2rem;
             margin-bottom: 1rem;
@@ -483,6 +492,18 @@
                 display: none;
             }
 
+            .hero {
+                padding-top: 70px;
+                min-height: auto;
+                padding-bottom: 4rem;
+            }
+
+            .hero-background,
+            .hero-canvas {
+                top: 70px;
+                height: calc(100% - 70px);
+            }
+
             .timeline-item:nth-child(odd) .timeline-content,
             .timeline-item:nth-child(even) .timeline-content {
                 margin: 0 0 0 30px;
@@ -498,7 +519,7 @@
             }
 
             .hero-content {
-                padding: 0 1rem;
+                padding: 1rem;
             }
 
             .container {
@@ -556,67 +577,54 @@
         <canvas id="hero-canvas" class="hero-canvas"></canvas>
         <div class="hero-content">
             <div class="profile-container">
-    <img src="resources/photo.jpeg" alt="Odyssefs Liagkas" class="profile-photo">
-</div>
+                <img src="resources/photo.jpeg" alt="Odyssefs Liagkas" class="profile-photo">
+            </div>
             <h1 class="hero-title">Odyssefs Liagkas</h1>
             <p class="hero-subtitle">M.Eng. in Biomedical Engineering at Cornell <br>Fulbright Scholar • Michael C. Soteriades Scholar</p>
             <p class="hero-subtitle"> Fast Robots - ECE 5160</p>
             <p class="hero-description">
                 Interdisciplinary background spanning life sciences and engineering, computer science and AI, as well as business and management. <br>
-             <br>Blending engineering and science expertise with leadership.
+                <br>Blending engineering and science expertise with leadership.
             </p>
             <a href="about.html" class="cta-button">About Me</a>
             <br><br>
             <a href="fast_robots.html" class="cta-button cta-button-secondary">Fast Robots Labs</a>
         </div>
-        
     </section>
 
-
-
-    <!-- Timeline Section -->
-    <!--<section class="timeline animate-on-scroll">
-        <div class="container">
-            <h2 class="section-title">Academic Journey</h2>
-            <div class="timeline-container">
-                <div class="timeline-line"></div>
-                
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">2025 - Present</div>
-                        <h3 class="timeline-title">Cornell University</h3>
-                        <p>M.Eng in Biomedical Engineering with focus on medical device innovation and robotics.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">2024 - 2025</div>
-                        <h3 class="timeline-title">NYU Tandon School</h3>
-                        <p>Computer Science Bridge Program - 400 hours of intensive programming and systems knowledge.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-item">
-                    <div class="timeline-marker"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-date">2019 - 2023</div>
-                        <h3 class="timeline-title">University of Athens</h3>
-                        <p>B.Sc. in Biology with GPA 8.09/10, specializing in cancer and inflammation research.</p>
-                    </div>
+<!-- Research Preview -->
+<section class="research-preview animate-on-scroll">
+    <div class="container">
+        <div class="research-grid">
+            <!-- Existing research cards... -->
+            
+            <!-- Add Facebook post as a featured card -->
+            <div class="research-card" style="overflow: hidden;">
+                <iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2FCornellEngineeringMEng%2Fposts%2Fpfbid021b2VhHNm6DAAm3hKihADhbqrSo77i4xNPUxFodVmBZsfrjGGsEFVcitagLTRGUC7l&show_text=true&width=500" 
+                        width="100%" 
+                        height="400" 
+                        style="border:none;overflow:hidden" 
+                        scrolling="no" 
+                        frameborder="0" 
+                        allowfullscreen="true" 
+                        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+                </iframe>
+                <div class="research-content">
+                    <h3 class="research-title">Student Spotlight</h3>
+                    <p class="research-description">
+                        Cornell Duffield College of Engineering
+                    </p>
                 </div>
             </div>
         </div>
-    </section>-->
-
+    </div>
+</section>
     <!-- Research Preview -->
     <section class="research-preview animate-on-scroll">
         <div class="container">
             <h2 class="section-title">Research Focus</h2>
             <div class="research-grid">
-                <div class="research-card tilt-card">
+                <div class="research-card card">
                     <img src="https://kimi-web-img.moonshot.cn/img/www.medicaldevice-network.com/b2c60abc2f92e21f8c5e1d626fc3db087305f546.jpg" 
                          alt="Tissue Tensioner Research" class="research-image">
                     <div class="research-content">
@@ -625,11 +633,10 @@
                             Developing a novel medical device for Total Knee Arthroplasty incorporating 
                             patellar tension measurement, using 6 DoF robotic arm for testing.
                         </p>
-                        <!--<a href="research.html" class="research-link">Learn More →</a> -->
                     </div>
                 </div>
 
-                <div class="research-card tilt-card">
+                <div class="research-card ">
                     <img src="https://kimi-web-img.moonshot.cn/img/axenehp.com/c39ac6084fa48ed006e8b83794f38f554b1c373b.jpg" 
                          alt="AI Cryo-EM Research" class="research-image">
                     <div class="research-content">
@@ -638,11 +645,10 @@
                             Implementing PyTorch-based AI pipelines for advanced cryo-EM applications 
                             in protein modeling.
                         </p>
-                        <!--<a href="research.html" class="research-link">Learn More →</a>-->
                     </div>
                 </div>
 
-                <div class="research-card tilt-card">
+                <div class="research-card ">
                     <img src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&auto=format&fit=crop" 
                          alt="Oleuropein Research" class="research-image">
                     <div class="research-content">
@@ -651,20 +657,18 @@
                             Investigating anti-cancer and anti-inflammatory effects of semi-synthetic 
                             oleuropein analogues through in vitro and in vivo experiments.
                         </p>
-                        <!--<a href="research.html" class="research-link">Learn More →</a> -->
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-
-        <!-- Highlights Section -->
+    <!-- Highlights Section -->
     <section class="highlights animate-on-scroll">
         <div class="container">
             <h2 class="section-title">Sample Achievements</h2>
             <div class="highlights-grid">
-                <div class="highlight-card tilt-card">
+                <div class="highlight-card">
                     <div class="highlight-icon">🎓</div>
                     <h3 class="highlight-title">Fulbright Scholar</h3>
                     <p class="highlight-description">
@@ -672,7 +676,7 @@
                         in Biomedical Engineering at Cornell University.
                     </p>
                 </div>
-                <div class="highlight-card tilt-card">
+                <div class="highlight-card">
                     <div class="highlight-icon">🔬</div>
                     <h3 class="highlight-title">Research Excellence</h3>
                     <p class="highlight-description">
@@ -680,14 +684,6 @@
                         for innovative cancer and inflammation research.
                     </p>
                 </div>
-               <!-- <div class="highlight-card tilt-card">
-                    <div class="highlight-icon">🏆</div>
-                    <h3 class="highlight-title">Innovation Leader</h3>
-                    <p class="highlight-description">
-                        Co-founder of FunguWear, developing sustainable biomaterials from mycelium, 
-                        winner of InnovInAgri 2022 Business Competition.
-                    </p>
-                </div> -->
             </div>
         </div>
     </section>
@@ -712,8 +708,6 @@
         </div>
     </section>
 
-
-    
     <!-- Footer -->
     <footer>
         <div class="footer-content">
