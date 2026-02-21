@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 3 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 3: Time of Flight Sensors</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objectives</h2>
+                <div class="section-content">
+                    <ul>
+                        <li>Power up the Artemis and sensors with a battery</li>
+                        <li>Add ToF distance sensors to the robot</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 3 Tasks</h2>
+                <div class="section-content">
+                    <ol>
+                            <li>Battery Power</li>
+                            <li>Connection of ToF</li>
+                            <li>I2C Channel</li>
+                            <li>Pros/Cons of ToF modes</li>
+                            <li>2 ToF Simultaneous Functionality</li>
+                            <li>Parallel Clock Print and Data Acquisition</li>
+                            <li>Timestamped ToF and IMU data</li>
+                            <li>Infrared transmission (5000-level)</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Prelab</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>The following is a sketch of all of the connections that are going to be made:</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/schema.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 1: Diagram of Wires</p>
+                    
+                    <div class="highlight-box">
+                        I decided that I will place one ToF at the front of the car, in the middle, and one on the right side, between the two wheels. That way.
+                            , I will have information from both X and Y axes. One scenario where the robot might miss obstacles
+                        is when it is moving in a straight line and there is a landmark on the left of its body. Having the ToF sensors placed in that manner would not allow for detection
+                    of this obstacle. The frontal sensor will give the car the ability to detect obstacles in its way sot hat it avoids them, and the one on the side will help it remain a set distance from a wall.
+                     If either one sensor was missing, the robot would have many different issues with its sensing.
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Battery Power</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>In order to power the Artemis up with our 650mAh battery, I needed to solder the battery to the JST connector.
+                        I connected the black wire of the JST connector to the positive end (red wire) of the battery -and vice versa- because, as shown in the image below, that's where the + terminal of the Artemis is:
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/battery_ends.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 1: Artemis + and - terminals</p>
+                    <p>I also used heat-shrink tubing to ensure the connections were secure and short-proof. The result is the following: <br>
+                    (Note the orange light which indicates that the battery is being charged by the Artemis)</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/battery_powered.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 3: Artemis powered by battery</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Connection of ToF</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>After installing the SparkFun VL53L1X 4m laser distance library, I took one of the two longer QWIIC cables and cut it in order to connect the ToF to the Artemis.
+                        I chose to cut these wires as that would allow for more flexibility in placing the ToF sensors. 
+                        The wires were passed through the back in order to be soldered in place, so that the sensor could easily have the sensing element looking "ahead".
+                        The following image shows the soldering that took place to form the secure connection:
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/first_tof.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 4: ToF with soldered wires</p>
+                </div>
+            </section>            
+
+            <section class="content-section">
+                <h2 class="section-title">I2C Channel</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>To test that the connections were made properly, I ran the Example05_wire_I2C example from the Apollo3 library and the address that was detected was <code>0x29</code>:</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/i2c_address.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 5: ToF I2C address</p>
+                    <p>This might seem weird, as the ToF's datasheet read that the address would be <code>0x52</code>. However, in binary, <code>0x29</code> is <code>00101001</code>.
+                    On the other hand, <code>0x52</code>, is <code>01010010</code>. As indicated by the sheet for the ToFs, the least significant bit is for setting read/write.
+                This explains the address that was  displayed, as it's the one we expected with an additional 1 at the end.</p>
+                </div>
+            </section>        
+
+            <section class="content-section">
+                <h2 class="section-title">Pros/Cons of ToF modes</h2>
+                <div class="section-content">
+                    <p>In order to test the sensor's range, accuracy, repeatability and ranging time, I made a case for Long, Long no ranging and the equivalent for short mode. These cases included the following code which samples 100 measurements:</p>
+                    <div class="code-block">
+                        <pre>   case GET_HUNDRED_TOF_DATA_LONG:
+        distanceSensor.setDistanceModeLong();
+    float timeMeasurementSTART2; 
+    float timeMeasurementSTOP2;
+    float distanceMeasurement2; 
+    if (!success) {return;}
+    // Collection of 100 data points
+    for (int i = 0; i < 100; i++) { 
+  timeMeasurementSTART2=millis();
+  distanceSensor.startRanging(); 
+    while (!distanceSensor.checkForDataReady())
+  {
+    delay(1);
+  }
+  distanceMeasurement2 = distanceSensor.getDistance(); 
+  distanceSensor.clearInterrupt();
+  distanceSensor.stopRanging();
+  timeMeasurementSTOP2=millis();
+    ToFs[i]=distanceMeasurement2;
+    timestamps[i]=(timeMeasurementSTOP2-timeMeasurementSTART2);
+} ....</pre>
+                    </div>
+
+                    <div class="code-block">
+                        <pre>   case GET_HUNDRED_TOF_DATA_LONG_no_ranging:
+        distanceSensor.setDistanceModeLong();
+        distanceSensor.setTimingBudgetInMs(20);
+        distanceSensor.setIntermeasurementPeriod(20);
+    float timeMeasurementSTART3; 
+    float timeMeasurementSTOP3;
+    float distanceMeasurement3; 
+    if (!success) {return;}
+    // Collection of 100 data points
+    distanceSensor.startRanging();
+    for (int i = 0; i < 100; i++) { 
+  timeMeasurementSTART3=millis();
+    while (!distanceSensor.checkForDataReady())
+  {
+    delay(1);
+  }
+  distanceMeasurement3 = distanceSensor.getDistance(); 
+  distanceSensor.clearInterrupt();
+  //distanceSensor.stopRanging();
+  timeMeasurementSTOP3=millis();
+    ToFs[i]=distanceMeasurement3;
+    timestamps[i]=(timeMeasurementSTOP3-timeMeasurementSTART3);
+} ....</pre>
+                    </div>
+                        <br><p>To compare the two modes I had the following setup:</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/mode_testing.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 6: ToF sensor mode comparison setup</p>
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>By using <code>distanceSensor.setDistanceModeLong();</code> or <code>distanceSensor.setDistanceModeShort();</code>, I can set the different mode of the sensor, and by
+                    changing <code>distanceSensor.setTimingBudgetInMs(20);</code> and <code>distanceSensor.setIntermeasurementPeriod(20);</code> I could allow for the measurement of different ranging times by also changing the code as is shown above. The medium mode required the use of the <code>Polulu VL53L1X</code> Library.</p>
+                    <p>Based on the infromation available in the data sheet, the short mode is less sensitive to light but effective in... shorter distances up to 1.3 meters. On the other hand the long mode is effective for up to 4 meters.</p>
+                    <p>The <b>range</b> of the Long mode was enough for me to get some 6 meter measurements. The short mode however, didn't manage to get measurements above 2m. These two modes were tested in 4 different distances. 500, 1000, 1500 and 2000 mm. The results are displayed in the figure below</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/mode_comparison.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 2: ToF sensor mode comparison results</p>
+                    <p>These results reflect what was said above as the long mode was more accurate in the longer distances.</p>
+                    <p>As far as <b>ranging time</b> is concerned, the mean time interval when we have <code>stopRanging()</code> inside the measurement loop was <b>49.9ms</b>.
+                     On the other hand, when <code>stopRanging()</code> was outside the loop, the mean time interval was <b>19.98ms</b></p>
+                    <p>Finally, for <b>repeatability</b>, both modes were relatively good, with an average standard deviation in measurements of <b>~1.45 mm</b></p>
+                    <p>I will be working with the short mode as our robots will not have to take measurements that are further than 1.3 meters and it's more robust as a mode.</p>
+                </div>
+            </section>        
+
+            <section class="content-section">
+                <h2 class="section-title">2 ToF Simultaneous Functionality</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>To add the second ToF sensor, I also soldered the XSHUT pin of the sensor to the A0 pin of the Artemis, which is an analog pin, used primarily for analogRead().
+                    For both sensors to be able to run at the same time the XSHUT pin needs to be help low when starting up so that it's disabled in the beginning. Then, the first sensor's address can be changed (0x39 was selected), allowing the second sensor to initialized by pulling the XSHUT pin high.
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/soldered_tof2.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 7: Second ToF soldered</p>
+
+                    <div class="lab-image">
+                        <img src="resources/Lab3/soldered_tof.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 8: Artemis with two ToF sensors</p>
+                    <p>The code used for that was: </p>
+                   <div class="code-block">
+                        <pre>...
+pinMode(SHUTDOWN_PIN, OUTPUT);
+  digitalWrite(SHUTDOWN_PIN, LOW);
+  distanceSensor.begin();
+  distanceSensor.setI2CAddress(0x39);
+  if (distanceSensor.begin() != 0) 
+  {
+    Serial.println("Sensor failed to begin.");
+    while (1)
+      ;
+  }
+
+  digitalWrite(SHUTDOWN_PIN, HIGH);
+  distanceSensor0.begin();
+if (distanceSensor0.begin() != 0) 
+  {
+    Serial.println("Sensor failed to begin.");
+    while (1)
+      ;
+  }
+....</pre>
+                    </div>
+                    <p>After adding the relevant code for <code>distanceSensor0</code>, I ran the code and the following image shows that the two sensors actually capture different distances simultaneously:</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/parallel_Tofs.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 9: Two ToF simultaneous functionality</p>
+                </div>
+            </section>        
+
+            <section class="content-section">
+                <h2 class="section-title">Parallel Clock Print and Data Acquisition</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>Until the ToF had new data ready, the code was "frozen". This delays the code by the amount stated above depending on the configuration. 
+                        To work around this, we can simply change the loop so that it checks if data is ready with <code>.checkForDataReady()</code> and, if data is not ready, the code is not "frozen" but cotninues running normally. 
+                        To see how fast our loop executes we can include print statements:
+                    </p>
+                   <div class="code-block">
+                        <pre>void loop(void)
+{
+  distanceSensor.startRanging(); 
+  distanceSensor0.startRanging(); 
+  if (distanceSensor.checkForDataReady())
+  {
+  int distance1 = distanceSensor.getDistance(); 
+  distanceSensor.clearInterrupt();
+  distanceSensor.stopRanging();
+  Serial.print("Distance1(mm): ");
+  Serial.println(distance1);
+  }
+  if (distanceSensor0.checkForDataReady())
+  {
+  int distance1 = distanceSensor0.getDistance(); 
+  distanceSensor0.clearInterrupt();
+  distanceSensor0.stopRanging();
+  Serial.print("Distance0(mm): ");
+  Serial.println(distance1);
+  }
+
+  Serial.print("Current clock time in ms: ");
+  Serial.println(millis());
+}</pre>
+                    </div>
+
+                    <p>Looking at the serial monitor we can see:</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/Loop_Execution.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 10: Loop Execution Speed</p>
+                    <p>This means that the average execution time of the loop was 7 milliseconds independently of whether data was read or not. 
+                        This is considerably faster than the previous method. As our Professor has stretched, the serial prints take some time to run, meaning that, if we removed them as well, the loop could be even faster.
+                        The limiting factor is the speed of the Artemis itself and in the future it will be the fact that we'll need to send the data through bluetooth.
+                    </p>
+                </div>
+            </section>        
+
+            <section class="content-section">
+                <h2 class="section-title">Timestamped ToF and IMU data</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>From Image 8, we saw the IMU and the two ToFs connected. I edited the code from previous labs and added measurement of the ToF sensors. I made a new case CMD for the Artemis and the following notification handler:</p>
+                    <div class="code-block">
+                        <pre>def IMU_and_ToF_handler(uuid, byteArray):
+    string = ble.bytearray_to_string(byteArray).strip()
+    T,P,R,D,A = string.split(",")
+    time = float(T[2:]) 
+    pitch = float(P[2:]) 
+    roll = float(R[2:]) 
+    distance = float(D[2:])
+    distance0= float(A[2:]) 
+    Timestamps.append(time)
+    Pitchs.append(pitch)
+    Rolls.append(roll)
+    ToFs.append(distance)
+    ToFs0.append(distance0)
+</pre>
+                    </div>
+                    <div class="highlight-box">
+                        Then I plotted the data:
+                    </div>
+                    
+                    <div class="lab-image">
+                        <img src="resources/Lab3/ToF_over_time.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 3: ToF part over time</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/IMU_over_time.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 4: IMU part over time</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/Both_over_time.png" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Figure 5: Combined data over time</p>
+                </div>
+            </section>
+            
+            <section class="content-section">
+                <h2 class="section-title">Infrared transmission (5000-level)</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>Most ToF sensors are Infrared. The one we use is no exception. There are two main categories of IR distance sensors: Active and Passive.
+                        Active sensors emit IR light and then sense the same beam after it is reflected back at them. Passive sensors detect IR radiation that is already present in the environment, such as heat emitted by living beings. They don't send out a signal of their own. This makes them very energy efficient. However, the can not measure exact distances. 
+                        The ToF sensors we use sends out a short pulse of IR light and measures the time it takes for the light beam to "fly" to the target and bounce back. Since the speed of light know, the distance can be calculated very accurately based on that time.
+                    </p>
+                    <p>Because a TOF sensor works by sending and receiving infrared light, its performance depends heavily on the surface it is measuring. Different colors and materials reflect infrared light in different ways. For example, lighter or shinier surfaces often reflect more IR light, while darker or matte surfaces may absorb more of it. This can affect the accuracy and consistency of the distance reading.</p>
+                    <p>For this reason I tested the sensors by sensing different materials and colors at a fixed distance of 500mm. However, it needs to be said that how perfectly I set it up could be debated. <b>When the sensors are permanently fixed on the car, I want to re-test the sensors and perhaps calibrate them.</b>The results are the following:</p>
+                    <p>White cardboard: 501 ||| Navy Blue cloth: 506 ||| Black cloth suitcase 511 ||| <br>semi-translucent plastic box 488 ||| White plastic cap 501 ||| Blue rough plastic 508</p>
+                    <p>The Following pictures are 3 examples of the tests:</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/white_cardboard.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 11: White Cardboard Measurement</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/translucent_plastic.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 12: Translucent Plastic Measurement</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab3/rough_blue_plastic.jpg" alt="Lab 1">
+                    </div>
+                    <p class="image-caption">Image 13: Rough Blue Plastic Measurement</p>
+                    <p>The differences weren't too noticable. The lighter the color the less the measured distance while the darker the bigger. The translucent box had the least measured distance while the black suitcase had the biggest one. However, again, due to the way I tested, I can not be that sure of the results. I want to permanently fix the sensors on the robot and then re-do these based on the materials that are going to be on the "arena" our cars will be in, as the materials do play a role that can end up being relatively significant.</p>
+                </div>
+            </section>        
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+                    <p>Lab 3 successfully integrated the ToF to the Artemis and established simultaneous IMU and ToF data transmission via bluetooth. Additionally, now the Artemis can run from the Battery.
+                        </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        <p>I used chatGPT for the plots, and I referred to Aidan McNay's and Lucca Correia's Websites for structuring this lab report.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
