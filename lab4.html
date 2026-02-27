@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 4 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 4: Motors and Open Loop Control</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objectives</h2>
+                <div class="section-content">
+                    <ul>
+                        <li>Integrate Motor Drivers to control motors</li>
+                        <li>Enable Open Loop Control of Car</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 4 Tasks</h2>
+                <div class="section-content">
+                    <ol>
+                            <li>PWM signals and setup</li>
+                            <li>Motor Functionality</li> <!--Both left and right and both!-->
+                            <li>Car Final Body</li>
+                            <li>PWM lower limit</li>
+                            <li>Callibration</li>
+                            <li>Open Loop Control</li>
+                            <li>analogWrite frequency (5000 level)</li>
+                            <li>Lowest PWM value speed (5000 level)</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Prelab</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>The following is a sketch of all of the connections that are going to be made (M1 and M2 correspond to the two motors and Battery is our 850mAh one):</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/schema.png" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Figure 1: Wiring Diagram</p>
+                    
+                    <div class="highlight-box">
+                        I decided that I will connect the two driver motors to the Artemis using the pins A13, A14, A15, A16
+                        as they are all capable of producing PDW signals and they are not going to be used by anything else. Though the pins are all next to each other, I like the ease of mind having them lined up provides. Also it would make it easier to couple the different inputs of the motor drivers, in addition to beign a more easily managable setup in terms of placement in the car.
+                    </div>
+                    <h2>Battery Discussion:</h3>
+                    <p>The motor drivers, and therefore the motors as well, are powered by the 3.7V 850mAh battery.
+                        The Artemis, however, is powered by the 3.7V 650mAh battery. This is to ensure smooth operation of both parts of the robot in case the motors tried to draw too much current which would have otherwise possibly make the Artemis turn off.
+                        Having two different batteries, separating the two compartments of the robot, ensures this won't happen. Additionally, as we know, the motors consume a lot of power. Having a different battery allows us to keep using the Artemis, for whatever purpose, in the scneario where the battery that powers the motors dies. And it makes sure we can run the motors for as long as possible as the Artemis doesn't consume power from the same battery.
+                    </p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">PWM signals and setup</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>After having soldered everything together, I connected my motors to the Oscilloscope and powered them via the lab's power supply as is shown below:
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/oscilloscope_setup.jpg" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Image 1: Motor Driver - Oscilloscope - Power Supply</p>
+                    <h4>Power Supply Settings:</h4>
+                    I powered the motor with 3.7 Volts since that is the same Voltage of our 850mAh battery, which is the one that'll be powering them afterwards.
+                    <br><br>
+                    <h4>The code that was used to test the motor was the following:</h4>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/motor_code.jpg" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Image 2: Motor Driver Code</p>
+                    This code defines the PINS as output on the Artemis and we begin by having #1 send a PWD signal with 50% duty cycle (127 = 255/2) while #2 is "off", and then, after a small delay, #2 sends the same type of PWM while #1 is "off". 
+                    <br>As a result, when we connect the drivers to the motors and run the same code, the wheels of the car go in one direction, then they stop briefly, and then they go in the other direction. This will be shown in a video.
+                    <br><br>
+                    <p>The following are two videos of the oscilloscope with different trigger settings so show both PWMs clearly:</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/jI24Y0qLWYk "  
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/kxGPHkeI9RU "
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Videos 1, 2: Oscilloscope of motor driver</p>
+
+
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Motor Functionality</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>After making sure the drivers worked, I soldered everything in place and tested the wheels spinning. The code was visible in Image 2. For the other set of wheels, I just changed the AB1IN and AB2IN definitions to the corresponding Artemis Pins (16 and 15 respectively).</p>
+                    <p>The following videos are showing the left and the right wheels moving while  being powered by the 850mAh battery:</p>
+
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/ekTtCx4ilVc " 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/F-6ZLVn6iOA "
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Videos 3, 4: Wheels moving alone</p>
+                    <br><br>
+
+                    <p>To make both wheels move at the same time I just added the two files together and tuned it like <source>:</p>
+                        <div class="code-block">
+<pre>#define FORWARD_LEFT 16
+#define BACKWARD_LEFT 15
+
+#define BACKWARD_RIGHT 14
+#define FORWARD_RIGHT 13
+
+void setup() {
+  pinMode(FORWARD_LEFT,OUTPUT);
+  pinMode(BACKWARD_LEFT,OUTPUT);
+  pinMode(BACKWARD_RIGHT,OUTPUT);
+  pinMode(FORWARD_RIGHT,OUTPUT);
+}
+void loop() {
+  analogWrite(FORWARD_LEFT,125); 
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,125); 
+  analogWrite(BACKWARD_RIGHT,0);
+  delay(1000);
+  
+  analogWrite(FORWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,0);  
+  analogWrite(BACKWARD_LEFT,125);
+  analogWrite(BACKWARD_RIGHT,125);
+  delay(1000);
+}
+</pre>
+                    </div>
+                    <p>Note that, in order to make the wheels go in the same direction the code should be that way so that one motor goes clockwise and the other counterclockwise, since they are flipped.</p>
+                    <p>The following video shows both of the wheels do the same motion at the same time:</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/_CZ11X6wV24 "
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Videos 5: Wheels moving at the same time</p>
+
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Car Final Body</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>In the following images, we can see the final body of the car. First we have the components secured to the car, and then we have the car with the top attached:
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/car_top.png" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Image 3: Top view of open car</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/closed_frontview.jpg" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Image 4: Front view of closed car</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/closed_sideview.jpg" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Image 5: Side view of closed car</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">PWM lower limit</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>When trying to test the PWM lower limit for my car, I set it at 50/255 and there was an issue of one pair of wheels getting stuck for a brief moment. That is visible in the following video (lower the playback speed to see it better):
+                    </p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/7CZVtqMuSXg "
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p>I hypothesized that it may have something to do with the battery, so I put it to charge and then retried and continued with the tests.</p>
+                    <p>That turned out to be true. While the battery was charging I made cases for the Artemis so that I could send commands from my computer in the following format where the first integer is the PWM for the left pair of wheels and the second is for the right:</p>
+                        <code>ble.send_command(CMD.PWM_TEST, "200|200")</code> <br><br>
+                    <p>After charging the battery to 100% I re-ran my tests and the results are the following:</p>
+                    <p>The lowest PWM signal I could send that would make the robot move from rest was <b>33</b>, while the lowest to rotate on-axis was <b>165</b>. The tires of the car are still brand new and the table provided a lot of friction. I believe that on a different surface it would have been lower.</p>
+                    <p>The code lines were:<br><code>ble.send_command(CMD.MOVE, "33|33")</code> and 
+                        <br><code>ble.send_command(CMD.SPIN_IN_PLACE, "165|165")</code>
+                        <br>where X|Y  X is the left wheels PWM and Y is the right ones'.</p>
+                    <p>For example, to move forward the code snippet would be:
+                        <br> <code>  analogWrite(FORWARD_LEFT,165); <br>
+  analogWrite(BACKWARD_LEFT,0);<br>
+  analogWrite(FORWARD_RIGHT,165); <br> analogWrite(BACKWARD_RIGHT,0);</code>
+                    <br>Here are videos of these commands being sent to Zeus:</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/Nc--pHhGpWU"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/X91_ckvF0qc" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Callibration</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>In order to demonstrate that Zeus (the robot) can move in a straight line, I recorded a video of it moving along a 2m straight path of tape:
+                    </p>
+                    <p>As we can see from the video, Zeus was able to follow the path along. I was extremely lucky and my motors did not need any callibration. <br>
+                    the code I used was: <code>ble.send_command(CMD.MOVE_2M_F, "80|80")</code></p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/X0NY6FMeGdk" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Open Loop Control</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>To implement an open loop control, since I didn't need to callibrate my wheels, I modified the Artemis case I made (mentioned under PWM lower limit), to make it move in a predefined manner without any input from the sensors. <code>ble.send_command(CMD.OPEN_LOOP, "60|115")</code> 60 is straight_speed and 115 is turn_speed (code below):
+                    </p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/P7JCbdswg8o" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+<div class="code-block">
+<pre>  analogWrite(FORWARD_LEFT,straight_speed); 
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,straight_speed); 
+  analogWrite(BACKWARD_RIGHT,0);
+  delay(1000);
+  analogWrite(FORWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,0);  
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(BACKWARD_RIGHT,0);
+
+  turnRight(turn_speed);
+
+  analogWrite(FORWARD_LEFT,straight_speed); 
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,straight_speed); 
+  analogWrite(BACKWARD_RIGHT,0);
+  delay(1000);
+  analogWrite(FORWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,0);  
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(BACKWARD_RIGHT,0);
+
+  turnLeft(turn_speed) ;
+
+  analogWrite(FORWARD_LEFT,straight_speed); 
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,straight_speed); 
+  analogWrite(BACKWARD_RIGHT,0);
+delay(1500);
+  analogWrite(FORWARD_LEFT,0);
+  analogWrite(FORWARD_RIGHT,0);  
+  analogWrite(BACKWARD_LEFT,0);
+  analogWrite(BACKWARD_RIGHT,0);
+</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">analogWrite frequency</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>In order to find the analogWrite's frequency I connected the oscilloscope to the pin A3 of the Artemis and sent an analogueWrite signal.
+                    </p>
+                    <div class="lab-image">
+                        <img src="resources/Lab4/oscilloscope_freq.jpg" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Image 6: Oscilloscope photo with PWM frequency</p>
+                    <p>The frequency measured was ~ 183 Hz (182.7Hz). Though it is low for PWM, it does work fine with our motors. The issue with low freq PWM's is that the switching speed might be too slow for the motor to smooth out the current. Based on that, we could say that if we could manually configuring the timers to generate a faster PWM signal, could allow us to have a smoother torque output and less instability.</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Lowest PWM value while moving</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>After having found the minimum PWM values to start moving from rest, I made the car move with 55 in a straight line and 175 to rorate on axis and the smallest values while in motion are <b>30</b> for going straight and <b>163</b> for on-axis rotation afterwards, they can stop immediately. This can be seen in the following videos:
+                    </p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/L56zSda2hIw" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/RXl7_0WEBwU" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+                    <p>Lab 4 successfully investigated the PWM our Artemis ouputs and secured all of the electronics on the robot's body and motors and they are now all functional.
+                        </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        <p>I referred to Aidan McNay's website for structuring this lab report.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
