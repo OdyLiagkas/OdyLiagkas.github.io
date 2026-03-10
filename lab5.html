@@ -694,13 +694,15 @@
                     <p>To calculate the PI control every loop, I changed it so that it didn't wait for ToF measurements. If a measurement was not ready, extrapolation happened. 
                         <br>This was achieved by adding <code>distanceSensor0.startRanging();</code> in the <b>WALL_PID case</b> and having the following in the final loop (along with other tweaks):</p>
 <div class="code-block">
-<pre>       if(distanceSensor0.checkForDataReady()){ curr_pos = distanceSensor0.getDistance();ToFtimestamps[tofcounter] = PID_time;ToFs0[tofcounter] = curr_pos;tofcounter+=1;
-                distanceSensor0.clearInterrupt();}
-                else if(tofcounter>1){ slope = (ToFs0[tofcounter-1]-ToFs0[tofcounter-2])/(ToFtimestamps[tofcounter-1]-ToFtimestamps[tofcounter-2]); 
-                curr_pos = ToFs0[tofcounter-1]+ (slope*(millis()-ToFtimestamps[tofcounter-1])/1000.0);
-                timestamps[extrapolationcounter]=millis();
-                ToFs[extrapolationcounter]=curr_pos;extrapolationcounter+=1;
-                }
+<pre>if(distanceSensor0.checkForDataReady())
+    {curr_pos = distanceSensor0.getDistance();ToFtimestamps[tofcounter] = PID_time;ToFs0[tofcounter] = curr_pos;tofcounter+=1;
+        distanceSensor0.clearInterrupt();}
+else if(tofcounter>1)
+        {slope = (ToFs0[tofcounter-1]-ToFs0[tofcounter-2])/(ToFtimestamps[tofcounter-1]-ToFtimestamps[tofcounter-2]); 
+        curr_pos = ToFs0[tofcounter-1]+ (slope*(millis()-ToFtimestamps[tofcounter-1])/1000.0);
+        timestamps[extrapolationcounter]=millis();
+        ToFs[extrapolationcounter]=curr_pos;extrapolationcounter+=1;
+        }
 </pre>
                     </div>
                     
