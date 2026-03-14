@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 6 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 6: Orientation Control</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objectives</h2>
+                <div class="section-content">
+                    <ul>
+                        <li>Employ PID control</li>
+                        <li>Perform linear extrapolation</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 5 Tasks</h2>
+                <div class="section-content">
+                    <ol>
+                            <li>Range/Sampling time discussion</li>
+                            <li>PID Discussion</li> 
+                            <li>Reaching goal</li>
+                            <li>Wind-up implementation (5000 level)</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Prelab</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>To have the Artemis communicate with the computer I made two Artemis cases: <b>CHANGE_PID_GAINS</b> and <b>WALL_PID</b>:</p>
+                    
+                    <div class="highlight-box">
+<div class="code-block">
+<pre>   case CHANGE_PID_GAINS:
+
+            // Extract the Kp value from the command string as a float
+            success = robot_cmd.get_next_value(Kp);
+            if (!success)
+                return;
+
+            // Extract the Ki value from the command string as a float
+            success = robot_cmd.get_next_value(Ki);
+            if (!success)
+                return;
+
+            // Extract the Kd value from the command string as a float
+            success = robot_cmd.get_next_value(Kd);
+            if (!success)
+                return;
+    break;
+</pre>
+                    </div>
+
+<div class="code-block">
+<pre>case WALL_PID:
+        goal_pos = 304; // in mm
+        curr_pos = 304; // so that the error is 0 originally
+        PWM = 0; 
+        drive_start = millis();
+        PID_prev_time=0;
+        error_prev = 0;
+        
+        distanceSensor0.setDistanceModeLong();   // distanceSensor0 --> front sensor
+        distanceSensor0.setTimingBudgetInMs(33);
+        distanceSensor0.setIntermeasurementPeriod(35);
+
+        PID_wall_active = !PID_wall_active;
+        if(PID_wall_active == false){stopCar(PWM);}
+        PID_counter = 0;
+
+        break;
+</pre>
+                    </div>
+                        <p>The first one simply changes the different PID gains, while the second one toggles the flag variable of the PID control for the specified distance of 304mm from the front ToF sensor. For the purposes of testing, PID_wall is toggled off 5 seconds after it was toggled on.</p>
+                        <p>Originally I set up a full PID controller (hence all three weights), but after testing, I decided I would only be keeping PI control because it gets the job done fine even without the D term, which introduces a lot of jerkiness and requires extra memory and computational cost that I don't want my robot to have to expend in the next labs.</p>
+                        <p>This happens inside of the main loop fo the Artemis where the following code is executed so long as the <code>PID_wall_active</code> flag is set to true:</p>
+<div class="code-block">
+<pre>if(PID_wall_active==true){
+                PID_time = millis();
+                if(PID_time-drive_start > 5000){PID_wall_active=false;stopCar(PWM);error_i = 0;
+                for(int i=0;i < PID_counter; i++){
+                         tx_estring_value.clear();
+                         tx_estring_value.append("T:");
+                         tx_estring_value.append(timestamps[i]);
+                         tx_estring_value.append(",P:");
+                         tx_estring_value.append(errors_P[i]);
+                         tx_estring_value.append(",I:");
+                         tx_estring_value.append(errors_I[i]);
+                         tx_estring_value.append(",A:");
+                         tx_estring_value.append(ToFs0[i]);
+                         tx_estring_value.append(",S:");
+                         tx_estring_value.append(PWMs[i]);                         
+                         tx_characteristic_string.writeValue(tx_estring_value.c_str());
+                                            }
+                continue;
+                }
+                curr_pos = ToFmeasurement(); // now the error is no longer 0
+                ToFs0[PID_counter] = curr_pos;
+                error_p = curr_pos - goal_pos;
+                error_i += error_p;//*(PID_time-PID_prev_time)/1000;
+                errors_P[PID_counter] = error_p;
+                errors_I[PID_counter] = error_i;
+                timestamps[PID_counter] = PID_time;
+                    if(error_p > 10 || error_p < -10 ){
+                    PWM = Kp * (curr_pos - goal_pos) + Ki * error_i;// + Kd * error_d;
+                    if(PWM > 0){PWM+=30;}
+                    else if(PWM < 0){PWM-=35;}
+                    // added min value for PWM so that it gets out of the deadband zone
+                    PWM = constrain(PWM, -255, 255); // so it doesn't overcome 255
+                    moveCar(PWM);
+                    PWMs[PID_counter]=PWM;
+                }
+                else{
+                    error_i = 0; // ==> I have set it up so that error_i is zeroed when we reach our goal
+                    PWMs[PID_counter]=0;
+                }         
+            PID_counter +=1;
+            PID_prev_time = PID_time;
+            }
+</pre>
+                    </div>
+                        <p>Based on the PI controller, a PWM is sent to the car with the <code>moveCar</code> function which makes the car go forward or backward based on the sign of PWM which can be negative or positive.</p>
+                        <p>All of the measurements taken during those 5s are saved in their respective arrays and are sent to the computer at the end, where it is handled by the following function:</p>
+                    
+<div class="code-block">
+<pre>def PID_handler(uuid, byteArray):
+    string = ble.bytearray_to_string(byteArray).strip()
+    T,P,I,A,S = string.split(",")
+    time = float(T[2:]) 
+    error_p = float(P[2:]) 
+    error_i = float(I[2:]) 
+    distance0= float(A[2:]) 
+    speed = float(S[2:])
+    Timestamps.append(time)
+    P_errors.append(error_p)
+    I_errors.append(error_i)
+    ToFs0.append(distance0)
+    speeds.append(speed)
+    goal_pos.append(304)
+</pre>
+                    </div>
+                    <p>The PI's workflow is the following:
+                        <ol>
+                            <li>ToF measurement</li>
+                            <li>calculation of proportional error term</li>
+                            <li>calculation of integral error term</li>
+                            <li>based on gains, PWM is determined and sent to car</li>
+                        </ol>
+                    </p>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Range/Sampling time discussion</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>In the code above, and more specifically the three lines:<br>
+                        <code>distanceSensor0.setDistanceModeLong();   // distanceSensor0 --> front sensor</code><br>
+                        <code>distanceSensor0.setTimingBudgetInMs(33);</code><br>
+                        <code>distanceSensor0.setIntermeasurementPeriod(35);</code><br>
+                        I set the ToF to long mode, I set the timing budget to 33ms and the intermeasurement period to 35ms.
+                        This results in lost accuracy but, in return, we have faster updates. The point of this class is for our robot to be... fast. For this to be the case, the robot needs to be able to get measurements fast in order to avoid obstacles when moving in high speed.
+                        Additionally, our robots are not accurate either way- there is a lot of noise present no matter how accurate our measuremetns. For this reason, I opted to trade of the accuracy for the sampling speed.
+                    </p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">PID Discussion</h2>
+                <div class="section-content">
+                    <h3>Proportional Part</h3>
+                    <p>I am going to be placing my robot approximately 3m away from a wall. The goal is 304mm. This means that the approximate max error will be 3000-300 = 2700. To calculate a Kp value that will keep us in a max of 100 PWM, we solve: <b>PWM=K_p*e_p</b> and we get ~0.037</p>
+                    <p>Since I have added <code>if(PWM > 0){PWM+=30;}</code> and <code>else if(PWM < 0 ){PWM-=35;}</code>, when PWM is 100, it will be turned into 133, and when it is 3, it will be 33 which is the speed at which my car can move. Same for backwards with the respective number to escape the deadband range. To make sure my car would not try to send a higher than 255 PWM signal I added <code>PWM = constrain(PWM, -255, 255);</code>. 
+                        <br>Also, as is shown in the code in the prelab section, I made it so that the integral term is zeroed when the robot reached the goal and stabilized, to prevent overshooting as much as possible in the perturbations (this can be seen in plot 4). For the pertrubations, to save battery, I have also made the robot turn off the motors completely when it reaches the goal and stabilizes.</p>
+                        <p>(Note: due to the space I was in on Monday, I had to do the tests from 2m. The first two plots are slightly below that. Due to lack of time, I had to keep going with those.)</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/bAaXtjVDfsg" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 1: Kp = 0.037</p>
+
+
+                    <div class="lab-image">
+                        <img src="resources/Lab5/P plot Kp 0 037.png" alt="Lab 5">
+                    </div>
+                    <p class="image-caption">Plot 1: P control, Kp = 0.037</p>
+
+                    
+                    <p>I tested with a Kp of 0.047, but it was worse in terms of only P control. I will add an I term either way so I stuck with 0.037. Below we can see the results of the test with Kp = 0.047</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/7fYNXnIo_Go"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 2: Kp = 0.047</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab5/P plot Kp 0 047.png" alt="Lab 5">
+                    </div>
+                    <p class="image-caption">Plot 2: P control, Kp = 0.047</p>
+                    <br><br>
+                    <h3>Integral Part</h3>
+                    <p>Proportional control on its own, was either too slow (for my taste, and the purposes of the class), or too fast. One thing that can solve this is keeping the slower version of P control (smaller Kp gain) and adding the I term as was shown in prelab section. To avoid overshooting and achieve stabilization, as I mentioned, the integral part of the error is zeroed when the robot reaches the goal.
+                        The logic behind this is that if the robot surpasses the goal due to momentum, the integral and the proportional terms will both be negative, "pulling" the robot back to the goal position.
+                    </p>
+                    <p>To tune the I term, I originally used Kp = <b>0.037</b> and Ki = <b>0.001</b> and after testing I ended up with Kp = <b>0.035</b>, Ki=<b>0.001</b>:</p>
+                        
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/JxDciIE1V0I" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 3: Kp = 0.037  Ki = 0.001</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab5/Kp 0 037 Ki 0 001.png" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Plot 3: PI control, Kp = 0.035, Ki = 0.001</p>
+                    <br><br>
+                    <p></p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/PCKsKc-CrEg"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 4: Kp = 0.035 Ki = 0.001</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab5/Kp 0 035 Ki 0 001.png" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Plot 4: PI control, Kp = 0.035, Ki = 0.001</p>
+                    <p>(Above, we can see the zeroing of the Integral error here that was described above.</p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Reaching goal and Perturbations</h2>
+                <div class="section-content">
+                    <p>In the following video, we can see the car reaching the goal and reacting to perturbations. As I want the robot to be able to react at all times, I have disabled the 5s limit and the debugging data sending to the computer so that it can run indefinetely.</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/hJMF4SRqaA0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 5: Reaching Goal and Reacting to Perturbations</p>
+                
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Extrapolation</h2>
+                <div class="section-content">
+                    <p>Through the timestamps array, I saw that the ToF was collecting data once every: <b>~33-40 milliseconds</b> on average.<br>
+                    On the other hand, the PI loop (having commented out <code>curr_pos = ToFmeasurement();</code> and added a <code>Serial.println(PID_time - PID_prev_time);</code> at the very end of my loop) ran once every: <b>20 milliseconds</b>.</p>
+                    <p>To calculate the PI control every loop, I changed it so that it didn't wait for ToF measurements. If a measurement was not ready, extrapolation happened. 
+                        <br>This was achieved by adding <code>distanceSensor0.startRanging();</code> in the <b>WALL_PID case</b> and having the following in the final loop (along with other tweaks):</p>
+<div class="code-block">
+<pre>if(distanceSensor0.checkForDataReady())
+    {curr_pos = distanceSensor0.getDistance();ToFtimestamps[tofcounter] = PID_time;ToFs0[tofcounter] = curr_pos;tofcounter+=1;
+        distanceSensor0.clearInterrupt();}
+else if(tofcounter>1)
+        {slope = (ToFs0[tofcounter-1]-ToFs0[tofcounter-2])/(ToFtimestamps[tofcounter-1]-ToFtimestamps[tofcounter-2]); 
+        curr_pos = ToFs0[tofcounter-1]+ (slope*(millis()-ToFtimestamps[tofcounter-1])/1000.0);
+        timestamps[extrapolationcounter]=millis();
+        ToFs[extrapolationcounter]=curr_pos;extrapolationcounter+=1;
+        }
+</pre>
+                    </div>
+                    
+                    
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/R0mr4FY5jgM"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 6: Robot reaching goal with raw and extrapolated data</p>
+                    <div class="lab-image">
+                        <img src="resources/Lab5/extrapolated plot.png" alt="Lab 4">
+                    </div>
+                    <p class="image-caption">Plot 5: Extrapolated data from ToF</p>
+                </div>
+                <p>Though not super evident from the video, we can observe that, using extrapolation, the car is deaccelerating faster after passing the goal position This is because of the higher sampling rate than having just the ToF readings. This can be observed by comparing Plot 5 with Plot 4, where the ToF readings are closer to 0 than the extrapolated ones. This allows for our robot to be... Fast, while maintaining better control compared to only ToF.</p>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Wind-up implementation</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>I first thought of how important this section is when trying to showcase my robot to a friend on the carpet floor of the design complex at Tang Hall. The carpet made the car accumulate so much error before it can start moving, that it made it ZOOM into the wall.
+                    </p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/xwkt9I9qoSM" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 7: Robot without wind-up protection.</p>
+                    <p>In order to overcome this issue, I simply made it so that, once the I term has exceeded <b>1000</b>, or went below <b>-1000</b>, it stayed at the respective value. <br>
+                        I selected that value due to the plots I got from my PI control testing. If i was at 4 meters and not 2, having that high an integral term would have been bad.
+                        <br>This was achieved with the following code:</p>
+<div class="code-block">
+<pre>error_i += error_p*(PID_time-PID_prev_time)/1000;
+    if(error_i>1000){error_i=1000;}
+    else if(error_i<-1000){error_i=-1000;}
+</pre>
+                    </div>
+                    <p>Now we can see the result where the windup isn't disastrous:</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/MOeb9Khqnuw"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="image-caption">Video 8: Robot with wind-up protection.</p>
+                </div>
+            </section>
+
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+                    <p>I finished this lab at 3:40 am on Tuesday morning, which is absolutely unusual for me. This happened due to my robot's left motor driver breaking on Saturday. I had to wait until today in the evening to get a replacement. I sincerely apologize if this report is not typed up to the usual standards.</p>
+                    <p>Lab 5 successfully employed PI control for the car as well as linear extrapolation of data points of the ToF sensor.
+                        </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        <p>I used Kimi for debugging and referred to Lucca Correia's website for structuring this lab report.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
