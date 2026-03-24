@@ -554,7 +554,7 @@
                     <p>Now, we get d as: <code>d = 1 / 2.731 = ~ 0.3662 </code> and, plugging it in m we get: <code>m = 0.3662 * 1.574 / ln(0.1) = ~ 0.2503</code></p>
                     <p>As these are for S.I. but our ToF sensors are getting measurements in mm, we have to divide them by 1000 to work for mm.</p>
                     <p><b>Final coefficients:</b> <code>d = 0.0003662</code> and <code>m = 0.0002503</code></p>
-                    <p>This makes <code>-d/m = ~1.463</code> and <code>1/m = 3995.21</code></p>
+                    <p>This makes <code>-d/m = ~1.463</code> and <code>-1/m = -3995.21</code></p>
                     <p>As a result, our A, B matrices are: </p>
                     <div class="lab-image" style="width: 80%; max-width: 800px;">
                         <img src="resources/Lab7/A_B_matrices.png" alt="Dynamics Equations">
@@ -577,7 +577,7 @@ m = 0.0002503
 A = np.array([[0,1],
              [0,-d/m],])
 B = np.array([[0],
-             [1/m],])
+             [-1/m],])
 
 usefulTimestamps = Timestamps[0:75]
 
@@ -600,6 +600,8 @@ print(Ad, Bd, C)
                         <img src="resources/Lab7/discretized_matrices.png" alt="Dynamics Equations">
                     </div>
                     <p class="image-caption">Fig 7: Discretized Matrices</p> 
+                    <h3>Important Note: the second entry of B (and Bd) had negative sign to work</h3>
+                    <br>
                     <p>Then, the state vector was initialized with: <code>x = np.array([[usefulToFs[0]],[0]])</code></p>
                     <p>To estimate the uncertainty, we have to define sigma 1, 2 and 3. sig_u is our process noise. It is the extend to which we trust the Kalman Filter. On the other hand, sig_z is our sensor noise. It is hwo muhc we trust the ToF sensor.</p>
                     <p>For our process noise, sigma_1 is how much we trust the position of our model, while sigma_2 is the trust in the velocity of the model. These two were set to sigma_1=sigma_2=sqrt(100/dt)= 52.97, with a dt of 0.03702 inintially, translating to an uncertainty of ±52.97mm</p>
@@ -684,7 +686,7 @@ Matrix<2,2> Ad = {1, 0.04112397,
                   0, 0.93983381};
 
 Matrix<2,1> Bd = {0.0,
-                  164.29870932};
+                  -164.29870932};
 
 Matrix<1,2> C_kf = {1, 0};
 
@@ -743,27 +745,69 @@ float kf_pos = 0;
                         <img src="resources/Lab7/robot_experimental_pwm.png" alt="Dynamics Equations">
                     </div>
                     <p class="image-caption">Fig 13: PWM values for test run</p>
-                    <p><br>To fully implement the KF, I firstly changed Sigma_z to 1000.0 (sigma_3 = ~31.65) to increase sensor uncertainty. Then, I made the following change in the loop so that the current position is the KF's prediction and not the ToF measurement:</p>
+                    <p><br>Up until now the prediction was only happening on measured ToF data. And since the measurement held a lot of weight, it was only natural that the KF would follow the measurements curve.</p>
+                    
+                    <p><br>To fully implement the KF so that it predicted the position of the car even when no ToF measurements were available, I firstly changed sigma_1 and sigma_2 to 60 (Sigma_u = 3600) to increase model uncertainty. I also made a new KF function to be able to call predict without having a new ToF measurement, and I also had it dynamically calculate the Ad and Bd matrices based on the measured dt between the loop iterations:</p>
 <div class="code-block">
-<pre>curr_pos = ToFmeasurement(); 
+<pre>void kalmanPredict(float pwm_input, float dt_actual) {
+    float dt_seconds = dt_actual / 1000.0;
+    
+    Matrix<2,2> Ad_dynamic = {1.0, dt_seconds,
+                              0.0, 1.0 - 1.463 * dt_seconds};
+
+    Matrix<2,1> Bd_dynamic = {0.0,
+                              -3995.21 * dt_seconds};
+    
+    Matrix<1,1> u_kf = {pwm_input / 120.0f};
+    
+    kf_mu = Ad_dynamic * kf_mu + Bd_dynamic * u_kf;
+    kf_sigma = Ad_dynamic * kf_sigma * ~Ad_dynamic + Sigma_u;
+}
+
+void kalmanUpdate(float measurement) {
+    Matrix<1,1> y_kf = {measurement};
+    
+    Matrix<1,1> sigma_m = C_kf * kf_sigma * ~C_kf + Sigma_z;
+    Matrix<2,1> kf_gain = kf_sigma * ~C_kf * Inverse(sigma_m);
+    Matrix<1,1> y_m = y_kf - C_kf * kf_mu;
+    
+    kf_mu = kf_mu + kf_gain * y_m;
+    kf_sigma = (Matrix<2,2>({1,0,0,1}) - kf_gain * C_kf) * kf_sigma;
+}
+
+void kalmanFilter(float measurement, float pwm_input, float dt) {
+    kalmanPredict(pwm_input, dt);   
+    kalmanUpdate(measurement);  
+}
+</pre>
+                    </div>
+
+                    <p>Additionally, I made the loop as fast as possible and when ToF data are not available, only KF predicted data are passed to the PI control like so:</p>
+<div class="code-block">
+<pre>kalmanPredict((float)PWM, (float)(PID_time-PID_prev_time));
+if(distanceSensor0.checkForDataReady()){ 
+    ToF_measurement = distanceSensor0.getDistance();
+    kalmanUpdate(ToF_measurement);             
+    distanceSensor0.clearInterrupt();
+                                        }
+
 ToFtimestamps[PID_counter] = PID_time;
-ToFs0[PID_counter] = curr_pos;
-if(!kf_initialized) {
-kf_mu(0,0) = curr_pos;
-kf_mu(1,0) = 0;
-kf_initialized = true;
-                    }
-kalmanFilter(curr_pos, (float)PWM);
+ToFs0[PID_counter] = ToF_measurement;
+
 kf_pos = kf_mu(0,0); 
-kf_ToFs[PID_counter]=kf_pos;
-//error_p = curr_pos - goal_pos; // previous error based only on ToF
-error_p = kf_pos - goal_pos;  // KF position is taken for the error
+KF_ToFs[PID_counter]=kf_pos;
+
+//error_p = curr_pos - goal_pos;  // OLD ERROR
+
+
+error_p = kf_pos - goal_pos;  // KF based error
+error_i += error_p*(PID_time-PID_prev_time)/1000;
 </pre>
                     </div>
                     <p>Now we can see the result of the implemented KF:</p>
                     <div class="video-container">
                         <iframe 
-                            src="https://www.youtube.com/embed/YrSJdivkuEE"
+                            src="https://www.youtube.com/embed/KD0ivosIo7A"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
@@ -778,8 +822,10 @@ error_p = kf_pos - goal_pos;  // KF position is taken for the error
                     </div>
                     <p class="image-caption">Fig 15: PWM values for implementation run</p>
 
-                    <p><br>We can see that, by decreasing the certainty of the ToF measurements, the KF curve slightly deviates from the measurements. 
+                    
                         <br><br>As our model isn't really accurate, and the ToF is fairly reliable when moving, I decided to keep my KF's uncertainties like this fow now. In later labs, I might go back and increase the ToF uncertainty if I determine it is needed.</p>
+
+                    
                 </div>
             </section>
 
