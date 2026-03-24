@@ -432,344 +432,354 @@
                 <h2 class="section-title">Objectives</h2>
                 <div class="section-content">
                     <ul>
-                        <li>Utilize IMU to obtain z-axis rotation (yaw)</li>
-                        <li>Employ angular PID control</li>
+                        <li>Employing Kalman Filter to supplement slowly sampled ToF measurements</li>
+                        <li>React quickly enough to stop car at set distance from wall</li>
                     </ul>
                 </div>
             </section>
 
             <!-- Tasks Section -->
             <section class="content-section">
-                <h2 class="section-title">Lab 6 Tasks</h2>
+                <h2 class="section-title">Lab 7 Tasks</h2>
                 <div class="section-content">
                     <ol>
-                            <li>Range/Sampling time discussion</li>
-                            <li>PID Discussion</li> 
-                            <li>Reaching goal</li>
-                            <li>Wind-up implementation (5000 level)</li>
+                            <li>Estimation of drag and momentum</li>
+                            <li>Initialization of KF (Python)</li> 
+                            <li>Implementation and testing of KF in Jupyter</li>
+                            <li>Implementation of KF on the Robot</li>
                     </ol>
                 </div>
             </section>
-
-            <!-- Tasks' Proof Section template -->
             <section class="content-section">
-                <h2 class="section-title">Prelab</h2>
+                <h2 class="section-title">Introduction</h2>
                 <div class="section-content">
                     <!--<h3>Step 1: Environment Setup</h3>-->
-                    <p>To have the Artemis communicate with the computer I made two additional Artemis cases similar to the ones from Lab5: <b>CHANGE_PID_ROT_GAINS</b> and <b>ROT_PID</b>:</p>
-                    
-                    <div class="highlight-box">
-<div class="code-block">
-<pre>   case CHANGE_PID_ROT_GAINS:
-
-            // Extract the Kp value from the command string as a float
-            success = robot_cmd.get_next_value(Kp_rot);
-            if (!success)
-                return;
-
-            // Extract the Ki value from the command string as a float
-            success = robot_cmd.get_next_value(Ki_rot);
-            if (!success)
-                return;
-
-            // Extract the Kd value from the command string as a float
-            success = robot_cmd.get_next_value(Kd_rot);
-            if (!success)
-                return;
-    break;
-</pre>
+                    <p>A Kalman Filter is a recursive algorithm that estimates the state of a dynamic system from measurements, when the system is noisy.
+                        <br><br>It works in two steps: Prediction and Update. 
+                        <ul>
+                            <li>Prediciton, uses the state space equation to... predict what value the ToF would measure</li>
+                            <li>Update, uses a new measurement to update that prediction</li>
+                        </ul>
+                        <div class="lab-image" style="width: 80%; max-width: 400px;">
+                            <img src="resources/Lab7/KF_code.png" alt="Dynamics Equations">
+                        </div>
+                    </p>
+                </div>
+            </section>
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Estimation of drag and momentum</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>To begin developing our Kalman Filter, we need to estimate our drag <b>(d)</b> and mass <b>(m)</b> coefficients as they are present in our system's dynamics equations:
+                    </p>
+                    <div class="lab-image" style="width: 30%; max-width: 400px;">
+                        <img src="resources/Lab7/system_dynamics_equations.png" alt="Dynamics Equations">
                     </div>
-                        <p>After determining I will not be using the Derivative term in my controler, I changed the code above, so that the third float changes the goal angle of the control with the following line <code>success = robot_cmd.get_next_value(goal_angle);</code></p>
-<div class="code-block">
-<pre>case ROT_PID:
-        goal_angle = 0; // in degrees
-        curr_angle = 0; // so that the error is 0 originally
-        PWM_rot = 0; 
-        drive_start_rot = millis();
-        PID_prev_time_rot=drive_start_rot;
-        error_prev_rot = 0;
-        error_i_rot = 0;
-        
-        dT_rot=0;
-        T0_rot=micros();
-        Now_rot=0;
-        myICM.resetFIFO(); 
+                    <p class="image-caption">Fig 1: Dynamics Equations</p>
 
-        
-        PID_rotation_active = !PID_rotation_active;
-
-        if(PID_rotation_active == false){stopCarRotation();}
-        PID_counter_rot = 0;
-        calc_yaw = 0.0;
-
-break;
-</pre>
+                    <p>In state space, these equations become:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 400px;">
+                        <img src="resources/Lab7/state_space_equations.png" alt="Dynamics Equations">
                     </div>
-                        <p>The first one changes the different PID gains for the rotational control. The second one toggles the flag variable of the rotational PID control. For the purposes of testing, PID_rotation is toggled off 5 seconds after it was toggled on.</p>
-                        <p>Despite setting up a full PID controller (hence all three weights), just like the previous lab, I decided I would only be keeping PI control because it gets the job done fine even without the D term, which requires extra memory and computational cost that I don't want my robot to have.</p>
-                        <p>The orientation control happens inside of the main loop of the Artemis where the following code is executed so long as the <code>PID_rotation_active</code> flag is set to true:</p>
-<div class="code-block">
-<pre>if(PID_rotation_active==true){
-                
-            PID_time_rot = millis();
-            if(PID_time_rot-drive_start_rot > 5000){PID_rotation_active=false;stopCarRotation();error_i_rot = 0;
-            for(int i=0;i < PID_counter_rot;i++){
+                    <p class="image-caption">Fig 2: State Space Equation</p>
+                    <p>Where A is the 2x2 matrix and B is the 2x1 matrix shown above. <br>We also have the C matrix, which is <code>C = [1,0]</code> instead of the [-1,0] we had in class, as our measurements are positive and velocities negative.</p>
+                    <p>Now, d is defined as: <code>d = u_ss / xdot_ss</code> and m as: <code>m = +d * t_0.9 / ln(0.1)</code> (because our speeds are negative but unit response will be positive)</p>
+                    <p>In order to obtain t_0.9 I created a RUN_to_WALL arduino case, which had the car move to the wall with a constant <b>PWM = 120</b> through the main loop:</p>
+                    <div class="code-block">
+<pre>if(PWM_wall_active==true){
+    PID_time = millis();
 
+    if(PID_time - drive_start > 1000 && PWM == 1){PWM = 120;}
+
+    if(PID_time-drive_start > 5000){
+        PWM_wall_active=false;stopCar(PWM);
+        error_i = 0;
+        for(int i=0;i < PID_counter; i++){
             tx_estring_value.clear();
             tx_estring_value.append("T:");
             tx_estring_value.append(timestamps[i]);
-            tx_estring_value.append(",P:");
-            tx_estring_value.append(errors_P[i]);
-            tx_estring_value.append(",I:");
-            tx_estring_value.append(errors_I[i]);
-            //tx_estring_value.append(",D:");
-            //tx_estring_value.append(errors_D[i]);
-            tx_estring_value.append(",Y:");
-            tx_estring_value.append(yaws[i]);
+            tx_estring_value.append(",A:");
+            tx_estring_value.append(ToFs0[i]);
             tx_estring_value.append(",S:");
             tx_estring_value.append(PWMs[i]);                         
             tx_characteristic_string.writeValue(tx_estring_value.c_str());
-                                            }
+            }
             continue;
             }
-            dmp_yaw = getDMPyaw();
-            yaws[PID_counter_rot] = dmp_yaw;
-            curr_angle=dmp_yaw;                
-            error_p_rot = curr_angle - goal_angle;
-            reciprocal_angle = goal_angle - (goal_angle < 0 ? -1 : 1) * 180;
-            if (abs(error_p_rot) > 180.0) {error_p_rot += (reciprocal_angle - curr_angle) / abs(reciprocal_angle - curr_angle) * 360.0;}
-            error_i_rot += error_p_rot*(PID_time_rot-PID_prev_time_rot)/1000;
-            //error_d_rot = (float(error_p_rot) - float(error_prev_rot))/(float(PID_time_rot) - float(PID_prev_time_rot));
-            timestamps[PID_counter_rot] = PID_time_rot;
-            errors_P[PID_counter_rot] = error_p_rot;
-            errors_I[PID_counter_rot] = error_i_rot;
-            //errors_D[PID_counter_rot] = error_d_rot;
+            curr_pos = ToFmeasurement(); // now the error is no longer 0
+            ToFs0[PID_counter] = curr_pos;
+            error_p = curr_pos - goal_pos;
+            timestamps[PID_counter] = PID_time;
+            if(error_p < 10){stopCar(PWM); PWM = 0;}
+                moveCar(PWM);
+                PWMs[PID_counter]=PWM;    
+            PID_counter +=1;
+            PID_prev_time = PID_time;
+            }
+</pre>
+                    </div>
+                <p>The data were captured by the computer via a handler too similar to the ones of the past, therefore it will not be included in this report to make it more legible.</p>
                 
-                    
-            PWM_rot = Kp_rot * error_p_rot + Ki_rot * error_i_rot;// + Kd_rot * error_d_rot; 
-            if(PWM_rot>0){PWM_rot+=155;}
-            else if(PWM_rot < 0){PWM_rot-=155;}
-            // add min value for PWM so that it moves
-            PWM_rot = constrain(PWM_rot, -255, 255);
-            rotateCar(PWM_rot);
-            PWMs[PID_counter_rot]=PWM_rot;
+                <p>After plotting said data I got the following plots:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 400px;">
+                        <img src="resources/Lab7/distances_plot.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 3: ToFs plot</p>
+                    <div class="lab-image" style="width: 100%; max-width: 400px;">
+                        <img src="resources/Lab7/pwm_plot.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 4: PWMs plot</p>
+                    <div class="lab-image" style="width: 100%; max-width: 400px;">
+                        <img src="resources/Lab7/speeds_plot.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 5: Speeds plot</p>
 
-            PID_counter_rot +=1;
-            PID_prev_time_rot = PID_time_rot;
-            //error_prev_rot = error_p_rot;
-}
-</pre>
+                    <p>I found it weird that the ToF would be to noisy when not moving, and so accurate moving. After cleaning the data and analazying it, I got the following plot:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 800px;">
+                        <img src="resources/Lab7/steady_state_speed.png" alt="Dynamics Equations">
                     </div>
-                        <p>Based on the PI controller, a PWM is sent to the car with the <code>rotateCar</code> function which makes the car rotate clockwise or counterclockwise based on the sign of PWM which can be positive or negative respectively.</p>
-                        <p>All of the measurements taken during those 5s are saved in their respective arrays and are sent to the computer at the end, where it is handled by the following handler:</p>
-                    
-<div class="code-block">
-<pre>def PID_ROT_handler(uuid, byteArray):
-    string = ble.bytearray_to_string(byteArray).strip()
-    T,P,I,Y,S = string.split(",")
-    time = float(T[2:]) 
-    error_p = float(P[2:]) 
-    error_i = float(I[2:]) 
-    #error_d = float(D[2:])
-    yaw= float(Y[2:]) 
-    speed = float(S[2:])
-    Timestamps.append(time)
-    P_errors.append(error_p)
-    I_errors.append(error_i)
-    #D_errors.append(error_d)
-    yaws.append(yaw)
-    speeds.append(speed)
-    goal_angles.append(0)
-</pre>
-                    </div>
-                    <p>The PI's workflow is the following:
-                        <ol>
-                            <li>theta (yaw) is calculated from IMU's dmp</li>
-                            <li>calculation of proportional error term</li>
-                            <li>calculation of integral error term</li>
-                            <li>based on gains, PWM is determined and sent to car</li>
-                        </ol>
-                        The <code>getDMPyaw</code> function returns the theta and is described here:
+                    <p class="image-caption">Fig 6: Final analysis plot</p>                
+
+                    <p><br>
+                    From the plot above, we can see that our 90% rise time is at 87941ms. If we subtract the first time entry we counted towards rise time (86334 ms) we get: <br>
+                    <code>t_09 = 87941 - 86367 = 1574 ms</code> 
+                    <br>We can also see that the steady state speed is <code> xdot_ss = -2.731 mm / ms</code>
                     </p>
-<div class="code-block">
-<pre>float getDMPyaw() {
-
-    icm_20948_DMP_data_t dmp;
-  do {
-    myICM.readDMPdataFromFIFO(&dmp);
-  } while (myICM.status == ICM_20948_Stat_FIFOMoreDataAvail);
-
-  if (myICM.status == ICM_20948_Stat_Ok) {
-    if ((dmp.header & DMP_header_bitmap_Quat6) > 0) {
-
-      float qx = ((double)dmp.Quat6.Data.Q1) / 1073741824.0;  
-      float qy = ((double)dmp.Quat6.Data.Q2) / 1073741824.0;  // takes scale to [-1,+1]
-      float qz = ((double)dmp.Quat6.Data.Q3) / 1073741824.0;  
-
-      // Quaternion to Euler angle conversion
-      float qw = sqrt(1.0 - min(((qx * qx) + (qy * qy) + (qz * qz)), 1.0));
-
-      // Yaw (z-axis rotation)
-      float siny = 2.0 * (qw * qz + qx * qy);
-      float cosy = 1.0 - 2.0 * (qy * qy + qz * qz);
-      float yaw_dmp = (float)(atan2(siny, cosy) * 180.0 / PI);
-
-      calc_yaw = yaw_dmp;
-      return calc_yaw;
-    }
-  }
-  return calc_yaw; // returns the old one if a new one isn't ready!
-}
-</pre>
-                    </div>
-
-                </div>
-            </section>
-
-            <section class="content-section">
-                <h2 class="section-title">Range/Sampling time discussion</h2>
-                <div class="section-content">
-                    <!--<h3>Step 1: Environment Setup</h3>-->
-                    <p>In the code above, and more specifically in:<br>
-                        <code>myICM.readDMPdataFromFIFO(&dmp);</code><br>
-                        The data is read from the First-In-First-Out (FIFO) buffer which "fill up" at a rate of <b>1.125kHz</b> which is extremely fast for our purposes. This would mean that the buffer could consume all the memory of my Artemis and make it crash. However, with the following line in setup:
-                        <code>myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 1.5);</code><br>
-                        that can be divided by three and be equal to <b>750Hz</b>, which is a pretty good sampling time for us, and the sweet spot between memory usage and frequency of samplings. (I tested dividing by 3 and 2 but the signals weren't as smooth)
-                    </p>
-                </div>
-            </section>
-
-            <section class="content-section">
-                <h2 class="section-title">PID Discussion</h2>
-                <div class="section-content">
+                    
                     <div class="highlight-box">
-                        <p>As said in the prelab section, only PI is going to be used for the reasons mentioned there.</p>
+                        For now, u_ss is going to be set to 1, so that it can be scaled relative to 120. When u is 0.5 it will be for PWM = 60, and when it's 2, it will be for PWM = 240.
+                    </div>
+
+                    <p>Now, we get d as: <code>d = 1 / 2.731 = ~ 0.3662 </code> and, plugging it in m we get: <code>m = 0.3662 * 1.574 / ln(0.1) = ~ 0.2503</code></p>
+                    <p>As these are for S.I. but our ToF sensors are getting measurements in mm, we have to divide them by 1000 to work for mm.</p>
+                    <p><b>Final coefficients:</b> <code>d = 0.0003662</code> and <code>m = 0.0002503</code></p>
+                    <p>This makes <code>-d/m = ~1.463</code> and <code>1/m = 3995.21</code></p>
+                    <p>As a result, our A, B matrices are: </p>
+                    <div class="lab-image" style="width: 80%; max-width: 800px;">
+                        <img src="resources/Lab7/A_B_matrices.png" alt="Dynamics Equations">
                     </div>
                     
-                    <h3>Proportional Part</h3>
-                    <p>Like in previous Lab, I have set it so that the deadband PWM value for rotation is added to whatever the contorller outputs. So, for the max PWM value of 255, I want the controller to output 90, as I have added 155 to it (or subtracted when it's negative). I am not adding 165 to have some slack. To calculate a Kp value that will keep us in a max output of 90 PWM, we solve: <b>PWM=K_p*e_p</b> for the max e_p being 180, and we get <b>K_p=0.5</b></p>
-                    <p>I have added <code>if(PWM > 0){PWM+=155;}</code> and <code>else if(PWM < 0 ){PWM-=155;}</code>, when PWM is 90, it will be turned into 245, and when it is 0, it will be 155 which is right under the speed at which my car can rotate. To make sure my car would not try to send a higher than 255 PWM signal I added <code>PWM = constrain(PWM, -255, 255);</code>. 
-
-                    <div class="video-container">
-                        <iframe 
-                            src="https://www.youtube.com/embed/3CZxTGxknIc" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p class="image-caption">Video 1: Kp_rot = 0.5</p>
-
-
-                    <div class="lab-image">
-                        <img src="resources/Lab6/P plot Kp 0 5.png" alt="Lab 5">
-                    </div>
-                    <p class="image-caption">Plot 1: P control, Kp_rot = 0.5</p>
-                    <br><br>
-                    
-                    <p>We can observe intense oscillations. The Kp is too high.</p>
-                    <h4>To test further I wanted to include the I term.</h3>
-
-                    <br><br>
-                    <h3>Integral Part</h3>
-                    <p>I started off with a tiny Kp value of 0.05 and a Ki value of 0.01:
-                    </p>
-                    
-                        
-                    <div class="video-container">
-                        <iframe 
-                            src="https://www.youtube.com/embed/8yk4A14aeoI" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p class="image-caption">Video 2: Kp = 0.037  Ki = 0.001</p>
-                    <div class="lab-image">
-                        <img src="resources/Lab6/Kp 0 05 Ki 0 01.png" alt="Lab 4">
-                    </div>
-                    <p class="image-caption">Plot 2: PI control, Kp = 0.035, Ki = 0.001</p>
-                    <br><br>
-                    <p>In the video above, we saw how Zeus (the robot) is capable of reacting to perturbations. The zeroing of the PWM values might seem strange originally but there is an explanation:
-                        <br>> from 929k to 930k, the negative I term opposes the current P term. Afterwards, the P and I terms are so close to zero that the PWM (being an int variable) is rounded to 0.
-                        <br>>> To fix this, I tuned both gains as the accumulated 'I' term would oppose the 'P' term's opposite sign oscillations.
-                    </p>
-                    <p>After some tuning, I ended up with Kp = 0.057 and Ki = 0.092. The robot correctly stops at 0, and the oscillation to get there is pretty minimal. </p>
-                    <div class="video-container">
-                        <iframe 
-                            src="https://www.youtube.com/embed/wkbJ81cvk64"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p class="image-caption">Video 3: Kp = 0.057 Ki = 0.092</p>
-                    <div class="lab-image">
-                        <img src="resources/Lab6/Kp 0 057 Ki 0 092.png" alt="Lab 4">
-                    </div>
-                    <p class="image-caption">Plot 3: PI control, Kp = 0.057, Ki = 0.092</p>
-
-                    <p>After some more tuning, I ended up with Kp = 0.045 and Ki = 0.052. The robot stops almost at 0, an 'almost' that we can tolerate as our system isn't accurate at all either way, and the oscillation to get there is pretty minimal even at almost -150 degrees initial error. Especially given the fact that I'll employ extra tactics in the future labs to ensure stability.</p>
-                    <div class="video-container">
-                        <iframe
-                            src="https://www.youtube.com/embed/48a9pFI9zUs"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <p class="image-caption">Video 4: Kp = 0.045 Ki = 0.052</p>
-                    <div class="lab-image">
-                        <img src="resources/Lab6/Kp 0 045 Ki 0 052.png" alt="Lab 4">
-                    </div>
-                    <p class="image-caption">Plot 4: PI control, Kp = 0.045, Ki = 0.052</p>                    
                 </div>
             </section>
 
+
+
+
+
             <section class="content-section">
-                <h2 class="section-title">Reaching goal and Perturbations</h2>
+                <h2 class="section-title">Initialization of KF (Python)</h2>
                 <div class="section-content">
-                    <p>In the following video, we can see the car reaching the goal and reacting to perturbations. As I want the robot to be able to react at all times, I have disabled the 5s limit and the debugging data sending to the computer so that it can run indefinetely.</p>
-                    <div class="video-container">
-                        <iframe 
-                            src="https://www.youtube.com/embed/TF43fmTEs9M"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
+                    <p>With the following code, I got my discretized matrices:</p>  
+                    <div class="code-block">
+<pre>d = 0.0003662
+m = 0.0002503
+A = np.array([[0,1],
+             [0,-d/m],])
+B = np.array([[0],
+             [1/m],])
+
+usefulTimestamps = Timestamps[0:75]
+
+deltat = []
+ttotal = 0
+
+for i in range(len(usefulTimestamps)-1):
+    deltat = (usefulTimestamps[i+1] - usefulTimestamps[i])/1000
+    ttotal += deltat
+Delta_T = ttotal / (len(usefulTimestamps) - 1)
+
+Ad = np.eye(2) + Delta_T * A
+Bd = Delta_T * B 
+C = np.array([[1,0]])
+
+print(Ad, Bd, C)
+</pre>
+                    </div>    
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/discretized_matrices.png" alt="Dynamics Equations">
                     </div>
-                    <p class="image-caption">Video 5: Reaching Goal and Reacting to Perturbations</p>
-                
+                    <p class="image-caption">Fig 7: Discretized Matrices</p> 
+                    <p>Then, the state vector was initialized with: <code>x = np.array([[usefulToFs[0]],[0]])</code></p>
+                    <p>To estimate the uncertainty, we have to define sigma 1, 2 and 3. sig_u is our process noise. It is the extend to which we trust the Kalman Filter. On the other hand, sig_z is our sensor noise. It is hwo muhc we trust the ToF sensor.</p>
+                    <p>For our process noise, sigma_1 is how much we trust the position of our model, while sigma_2 is the trust in the velocity of the model. These two were set to sigma_1=sigma_2=sqrt(100/dt)= 52.97, with a dt of 0.03702 inintially, translating to an uncertainty of ±52.97mm</p>
+                    <p>For the sensor noise, sigma_3 was set to 10mm because despite the noise while static, when moving, the sensor was very accurate as per Fig. 3</p>
+                    <div class="code-block">
+<pre>sigma_1 = 52.97 # in mm
+sigma_2 = 52.97
+
+sigma_3 = 10 
+
+Sigma_u=np.array([[sigma_1**2,0],
+                [0,sigma_2**2]]) 
+
+Sigma_z=np.array([[sigma_3**2]])
+
+print(Sigma_u, Sigma_z)
+</pre>
+                    </div>                    
+                    <p>The resulting matrices are:</p>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab7/covariance_matrices.png" alt="Dynamics Equations">
+                    </div>
+                </div>
+            </section>
+
+
+
+            <section class="content-section">
+                <h2 class="section-title">Implementation and testing of KF in Jupyter</h2>
+                <div class="section-content">
+                    <p>Now it's time to implement and test the Kalman Filter on Jupyter. The following code was given to us:</p>
+                    <div class="code-block">
+<pre>def kf(mu,sigma,u,y):
+    
+    mu_p = A.dot(mu) + B.dot(u) 
+    sigma_p = A.dot(sigma.dot(A.transpose())) + Sigma_u
+    
+    sigma_m = C.dot(sigma_p.dot(C.transpose())) + Sigma_z
+    kkf_gain = sigma_p.dot(C.transpose().dot(np.linalg.inv(sigma_m)))
+
+    y_m = y-C.dot(mu_p)
+    mu = mu_p + kkf_gain.dot(y_m)    
+    sigma=(np.eye(2)-kkf_gain.dot(C)).dot(sigma_p)
+
+    return mu,sigma
+</pre>
+                    </div> 
+                    <p>To test whether my uncertainty matrices were "correct" in terms of order of magnitude, I first ran the KF with a constant u=1 and the data which I used to derive d and m. (There, PWM=constant=120)</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/experimental_wall_run.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 8: KF vs actual ToF measurements</p> 
+                    <p>This tells me that the values I have selected are good in terms of order of magnitude.</p>
+                    <p>If I change sigma_1=sigma_2=0.52, the result is a very very bad KF which essentially says that the model has very little uncertainty and thus the sensor measurements aren't utilized nearly enough:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/broken_KF.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 9: "Broken" Kalman Filter</p> 
+
+                    <p><br>After running the PI control to have Zeus run to the wall, this is the resulting plot:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/experimental_KF.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 10: Experimental Kalman Filter comparison to actual ToF</p> 
+                    <p>The line is actually tracking the points extremely well. I added a delay when the car would reach the 304mm target distance and we can see that the Kalman Filter still follows the next measurement very well. This makes sense, because my two sig matrices show that we think the sensor has much much less uncertainty than the model. <br><br>If I change sig_z and make it 3600 by having sigma_3 = 60, the result is:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/kf_model_trust.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 11: KF putting more trust in model</p>
+                    <p>Here, the KF position estimate doesn't follow the points as closely, because it is trusting the model more than the measurements.</p>
                 </div>
             </section>
 
             <section class="content-section">
-                <h2 class="section-title">Wind-up implementation</h2>
+                <h2 class="section-title">Implementation of KF on the Robot</h2>
                 <div class="section-content">
                     <!--<h3>Step 1: Environment Setup</h3>-->
-                    <p>As we can see from the following video, the wind-up protection is extremely important as in that case, the car completely loses the ability to stabilize.
+                    <p>To implement the KF on my robot I first added the following in the beginning of the file which are from the calculations I did on jupyter:</p>
+                    <div class="code-block">
+<pre>//// KALMAN FILTER
+Matrix<2,2> Ad = {1, 0.04112397,
+                  0, 0.93983381};
+
+Matrix<2,1> Bd = {0.0,
+                  164.29870932};
+
+Matrix<1,2> C_kf = {1, 0};
+
+// Noise covariance
+Matrix<2,2> Sigma_u = {2805.82, 0,
+                        0,       2805.82};  // sigma=52.97 squared
+
+Matrix<1,1> Sigma_z = {100.0};  // sigma=10 squared
+
+// KF state
+Matrix<2,1> kf_mu = {0, 0};
+Matrix<2,2> kf_sigma = {2805.82, 0,
+                         0,       2805.82};
+bool kf_initialized = false;
+float kf_pos = 0;
+</pre>
+                    </div> 
+
+                    <p>I also added the following function to do the predict and update step:</p>
+                    <div class="code-block">
+<pre>void kalmanFilter(float measurement, float pwm_input) {
+    Matrix<1,1> u_kf = {pwm_input / 120.0f}; 
+    Matrix<1,1> y_kf = {measurement};
+
+    // Predict
+    Matrix<2,1> mu_p = Ad * kf_mu + Bd * u_kf;
+    Matrix<2,2> sigma_p = Ad * kf_sigma * ~Ad + Sigma_u;
+
+    // Update
+    Matrix<1,1> sigma_m = C_kf * sigma_p * ~C_kf + Sigma_z;
+    Matrix<2,1> kf_gain = sigma_p * ~C_kf * Inverse(sigma_m);
+    Matrix<1,1> y_m = y_kf - C_kf * mu_p;
+
+    kf_mu = mu_p + kf_gain * y_m;
+    kf_sigma = (Matrix<2,2>({1,0,0,1}) - kf_gain * C_kf) * sigma_p;
+}
+</pre>
+                    </div> 
+                    <p>The other additions I made to my PID code were small and not worth pasting the entire code block.</p>
+                    <p>The following video shows the car performing the WALL PI movement. There, just to test the implementation I just had the KF output logged to see how it compared with my python tests.
                     </p>
                     <div class="video-container">
                         <iframe 
-                            src="https://www.youtube.com/embed/Cfo2_bvJbWM" 
+                            src="https://www.youtube.com/embed/IYij2-KnCrQ" 
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
                     </div>
-                    <p class="image-caption">Video 6: Robot without wind-up protection.</p>
-                    <p>In order to overcome this issue, I simply made it so that, once the I term has exceeded <b>35</b>, or went below <b>-35</b>, it stayed at the respective value. <br>
-                        I selected that value based on to the plots I got from my PI control testing.
-                        <br>This was achieved with the following code:</p>
+                    <p class="image-caption">Video 1: Robot performing PI motion to wall.</p>
+                    <p><br>These plots show the comparison between ToF measurements and KF predictions, and PWM values:</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/robot_experimental_kf.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 12: ToF and KF values of test run</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/robot_experimental_pwm.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 13: PWM values for test run</p>
+                    <p><br>To fully implement the KF, I firstly changed Sigma_z to 1000.0 (sigma_3 = ~31.65) to increase sensor uncertainty. Then, I made the following change in the loop so that the current position is the KF's prediction and not the ToF measurement:</p>
 <div class="code-block">
-<pre>error_i_rot += error_p_rot*(PID_time_rot-PID_prev_time_rot)/1000;
-    if(error_i_rot>35){error_i_rot=35;}
-    else if(error_i_rot<-35){error_i_rot=-35;}
+<pre>curr_pos = ToFmeasurement(); 
+ToFtimestamps[PID_counter] = PID_time;
+ToFs0[PID_counter] = curr_pos;
+if(!kf_initialized) {
+kf_mu(0,0) = curr_pos;
+kf_mu(1,0) = 0;
+kf_initialized = true;
+                    }
+kalmanFilter(curr_pos, (float)PWM);
+kf_pos = kf_mu(0,0); 
+kf_ToFs[PID_counter]=kf_pos;
+//error_p = curr_pos - goal_pos; // previous error based only on ToF
+error_p = kf_pos - goal_pos;  // KF position is taken for the error
 </pre>
                     </div>
-                    <p>Now we can see the result where the windup isn't disastrous:</p>
+                    <p>Now we can see the result of the implemented KF:</p>
                     <div class="video-container">
                         <iframe 
-                            src="https://www.youtube.com/embed/h8HWtrpemzM"
+                            src="https://www.youtube.com/embed/YrSJdivkuEE"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                             allowfullscreen>
                         </iframe>
                     </div>
-                    <p class="image-caption">Video 7: Robot with wind-up protection.</p>
+                    <p class="image-caption">Video 2: Robot performing PI motion to wall with KF predictions.</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/robot_implementation_kf.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 14: ToF and KF values of implementation run</p>
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab7/robot_implementation_pwm.png" alt="Dynamics Equations">
+                    </div>
+                    <p class="image-caption">Fig 15: PWM values for implementation run</p>
+
+                    <p><br>We can see that, by decreasing the certainty of the ToF measurements, the KF curve slightly deviates from the measurements. 
+                        <br><br>As our model isn't really accurate, and the ToF is fairly reliable when moving, I decided to keep my KF's uncertainties like this fow now. In later labs, I might go back and increase the ToF uncertainty if I determine it is needed.</p>
                 </div>
             </section>
 
@@ -778,12 +788,23 @@ break;
             <section class="content-section">
                 <h2 class="section-title">Discussion</h2>
                 <div class="section-content">
-                    <p>Lab 6 successfully employed rotational PI control for the car by utilizing the IMU's Digital Motion Processor.
+                    <h3>KF Parameters:</h3>
+                    <p>
+                        <ul>
+                            <li><b>m</b>: m is a proxy for the mass of the car. Higher m leads to higher momentum (acelerates and deccelerates less).</li>
+                            <li><b>d</b>: d is a drag coefficient, which affects max speed and passive deceleration when the input to the car is 0.</li>
+                            <li><b>σ1/σ2</b>: sigma 1 and 2 are the uncertainy of the sensor measurements. </li>
+                            <li><b>σ3</b>: sigma 3 is the uncertainty of our car's model.</li>
+                            -> Having σ1/σ2 > σ3, means that we place more trust in our model, than our sensor measurements. Conversely, σ3 > σ1/σ2, means we put more trust in our sensor measurements (which is also what I have done).
+                        </ul>
+                    </p>
+
+                    <p>Lab 7 successfully employed a Kalman Filter for the car.
                         </p>
                     
                     <div class="highlight-box">
                         <h4>Collaboration</h4>
-                        <p>I used Claude for debugging and referred to Lucca Correia's website for structuring this lab report.</p>
+                        <p>I used Claude for plotting and some debugging, and referred to Aidan Derocher's and Lucca Correia's websites for structuring this lab report.</p>
                     </div>
                 </div>
             </section>
