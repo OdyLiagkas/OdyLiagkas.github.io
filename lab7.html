@@ -839,9 +839,9 @@ error_i += error_p*(PID_time-PID_prev_time)/1000;
                         <ul>
                             <li><b>m</b>: m is a proxy for the mass of the car. Higher m leads to higher momentum (acelerates and deccelerates less).</li>
                             <li><b>d</b>: d is a drag coefficient, which affects max speed and passive deceleration when the input to the car is 0.</li>
-                            <li><b>σ1/σ2</b>: sigma 1 and 2 are the uncertainy of the sensor measurements. </li>
-                            <li><b>σ3</b>: sigma 3 is the uncertainty of our car's model.</li>
-                            -> Having σ1/σ2 > σ3, means that we place more trust in our model, than our sensor measurements. Conversely, σ3 > σ1/σ2, means we put more trust in our sensor measurements (which is also what I have done).
+                            <li><b>σ1/σ2</b>: sigma 1 and 2 are the uncertainy of our car's model. </li>
+                            <li><b>σ3</b>: sigma 3 is the uncertainty of the sensor's measurements.</li>
+                            -> Having σ1/σ2 < σ3, means that we place more trust in our model, than our sensor measurements. Conversely, σ3 < σ1/σ2, means we put more trust in our sensor measurements (which is also what I have done).
                         </ul>
                     </p>
 
