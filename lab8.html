@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 8 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Code block highlight spans */
+.highlight-pink   { color: #ff79a8; }
+.highlight-blue   { color: #79c8ff; }
+.highlight-yellow { color: #ffe066; }
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 8: Stunts!</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objectives</h2>
+                <div class="section-content">
+                    
+                    <ul>
+                        <li>Kalman Filter implementation to have car drift a set distance from wall.</li>
+                        <li>React quickly enough to prevent car from hitting wall</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 8 Sections</h2>
+                <div class="section-content">
+                    <ol>
+                            <li>Introduction</li>
+                            <li>Original Drift Tries</li> 
+                            <li>Proper Drift</li>
+                            <li>Blooper</li>
+                    </ol>
+                </div>
+            </section>
+            <section class="content-section">
+                <h2 class="section-title">Introduction</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>In this lab, the same Kalman Filter that was developed in Lab7 was used to have the car drift.
+                        <br><br>The KF works in two steps: Prediction and Update. <b>When ToF data are not ready, the car uses only the prediction step of the KF to predict the distance from the wall</b>.
+                        <div class="lab-image" style="width: 80%; max-width: 400px;">
+                            <img src="resources/Lab7/KF_code.png" alt="Dynamics Equations">
+                        </div>
+                        
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Original Drift Tries</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <div class="highlight-box"><b>NOTE:</b> because the code snippets were big, I removed sections with variables, other initializations and lines for data sending to jupyter, and replaced them with '[...]'
+                    <br><br>I also added coloring scripts for the codeblocks to make them more legible. <b>Please read the colored comments in the code.</b>
+                    <br><br><b>Also, I included Greek music in my videos on purpose, enjoy!</b></div>
+                    <p>As per usual, I made a new command for the Artemis titled <code>DRIFT_STUNT</code>, which is very similar to the one for the KF implementation in terms of initialization, but it then calls <code>KFtoWall(PWM)</code>.
+                    <div class="code-block">
+<pre>case DRIFT_STUNT:
+[...]
+        
+        distanceSensor0.setDistanceModeLong();   
+        distanceSensor0.setTimingBudgetInMs(33);
+        distanceSensor0.setIntermeasurementPeriod(35);
+        kf_initialized = false;
+
+        PID_wall_active = !PID_wall_active;
+        if(PID_wall_active == true){distanceSensor0.startRanging();
+            driftQ = true;
+        
+        <pink>while(!distanceSensor0.checkForDataReady()){}
+        ToF_measurement = distanceSensor0.getDistance();
+        curr_pos = ToF_measurement;        
+        
+        kf_mu(0,0) = curr_pos;
+        kf_mu(1,0) = 0;
+        </pink>
+        } // <blue>KF initialization complete</blue>
+
+        [...]
+
+        distanceSensor0.clearInterrupt();
+
+[...]
+
+        <yellow>KFtoWall(PWM);</yellow>
+
+break;
+</pre>
+                    </div>    
+
+                <code>KFtoWall(PWM)</code> uses the Error just to know when to drift, at which point <code>driftCar()</code> is called. The PWM is constant. The code is the following:
+                    <div class="code-block">
+<pre>void KFtoWall(int driftPWM){
+    while(driftQ == true)  {    
+        PID_time = millis();
+        <pink>kalmanPredict((float)driftPWM, (float)(PID_time-PID_prev_time));</pink>
+        if(distanceSensor0.checkForDataReady()){ 
+            ToF_measurement = distanceSensor0.getDistance();
+        <pink>kalmanUpdate(ToF_measurement);             </pink>
+        distanceSensor0.clearInterrupt();}
+        [...]
+        kf_pos = kf_mu(0,0); 
+        [...]
+        error_p = kf_pos - goal_pos;  
+            if(error_p > 15 ){ 
+//<yellow>I give it a "slack" of 15 for the error because our sensor is imperfect</yellow>
+            moveCar(driftPWM);
+        }
+        else{
+//<yellow>If the error is less than 15, the robot understands it needs to drift</yellow>
+            if(driftQ == false){
+            stopCar(driftPWM);} 
+            if(driftQ == true){
+            driftQ = false;
+                analogWrite(BACKWARD_RIGHT,0); //<yellow>non-active breaking</yellow>
+                analogWrite(BACKWARD_LEFT,0); 
+                analogWrite(FORWARD_LEFT,0); 
+                analogWrite(FORWARD_RIGHT,0);
+            [...]
+            <pink>driftCar(179.0);</pink> //<blue> the car will be looking opposite to the wall</blue>
+            moveCar(driftPWM);delay(DELAY_MS);stopFast();
+        PID_wall_active=false;stopFast();error_i = 0; kf_initialized = false;
+        [...]
+                    }
+                }         
+            [...]
+    }
+}
+</pre>
+                    </div>    
+
+                    <br><code>driftCar()</code> is pretty much an implementation of rotational PID with the target angle being 179.0:
+                    </p>
+                    <div class="code-block">
+<pre>void driftCar(float drift_angle){ // <yellow>will run until drift is successful</yellow>
+    bool done=false;
+    error_i_rot = 0;
+    <pink>while(done==false){</pink>
+        PID_time_rot = millis();
+        dmp_yaw = getDMPyaw();
+        curr_angle=dmp_yaw;                
+        error_p_rot = curr_angle - drift_angle;
+        reciprocal_angle = drift_angle - (drift_angle < 0 ? -1 : 1) * 180;
+        if (abs(error_p_rot) > 180.0) 
+        {error_p_rot += (reciprocal_angle - curr_angle) / abs(reciprocal_angle - curr_angle) * 360.0;}
+        error_i_rot += error_p_rot*(PID_time_rot-PID_prev_time_rot)/1000;
+        if(error_i_rot>35){error_i_rot=35;}
+        else if(error_i_rot<-35){error_i_rot=-35;}
+        
+        <blue>if(error_p_rot > 3 || error_p_rot < -3 ){</blue>
+        // <yellow>accepted "error" to consider we have reached angle: (-3,3)</yellow>
+            PWM_rot = Kp_rot * error_p_rot + Ki_rot * error_i_rot;
+            if(PWM_rot>0){PWM_rot+=155;}
+            else if(PWM_rot< 0){PWM_rot-=155;}
+            // <yellow>added min value for PWM so that it moves</yellow>
+            PWM_rot = constrain(PWM_rot, -255, 255);
+            rotateCar(PWM_rot);
+        <blue>}</blue>
+        else{
+            <blue>stopCarRotation();</blue>
+            <pink>done=true;</pink>
+
+        }         
+            [...]
+    <pink>}</pink>
+}
+</pre>
+                    </div>   
+                    In theory, I perhaps didn't have to use PI control for the drift, and I could've just made it so that it rotates a certain amount. However, I liked it and wanted to implement it like this so that, if I have to make the car make a U-turn in following labs, I will be able to quickly use that PI controled rotation to achieve it no matter the circumstances.
+                
+                    <br><br>The following videos show two tries to drift with this code with different PWM values and <code>Kp_rot=0.0425|Ki_rot=0.1</code>:
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/H47X3CSRatE" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/8SWeZ3dROT4"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    From the second video, it is evident that changes needed to happen in the PI controller of the <code>driftCar()</code> function, so that it doesn't rotate so much before aligning and returning to me.
+                </div>
+            </section>
+
+
+
+
+
+            <section class="content-section">
+                <h2 class="section-title">Proper Drift</h2>
+                <div class="section-content">
+                    <p>The first thing I changed, were the P and I gains. I tuned them to: <br><code>Kp_rot=0.02425|Ki_rot=0.015</code></p>
+                    <p>The logic behind it, was that I didn't want the original error to be so large that it makes the car overshoot the goal so much, but I wanted it large enough that it would manage to overshoot by enough, so that it would be able to quickly go back to goal angle from 'overshot position'.</p>  
+                    <p>I also changed the following line of <code>driftCar()</code></p>
+                    <div class="code-block">
+<pre><blue>if(error_p_rot > 3 || error_p_rot < -3 )</blue>
+</pre>
+                    </div>
+                    with:
+                    <div class="code-block">
+<pre><pink>if(error_p_rot > 8 || error_p_rot < -8 )</pink>
+</pre>
+                    </div>
+                    I made that change because I didn't want the car to get stuck waiting for the 'I' term of the controller to align it so perfectly (can be seen in previous video "drift slow PI"). Again, it's not like our robot cares so much about accuracy. Especially for the stunt. 
+                    <br><br>In short, I just increased the laxity of what is considered "successful reaching of goal", from 3 to 8
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/kScklf28GbI" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div> 
+                    The following plot shows what was sent to Jupyter. The reason the ToF measurements look like that, is that when ToF data weren't available, I had the same value entered in the array to have same sized arrays.   
+                    <div class="lab-image" style="width: 100%; max-width: 700px;">
+                        <img src="resources/Lab8/ToF_plot.png" alt="Dynamics Equations">
+                    </div>
+
+                    As is evident by the plot, I don't really trust our car's model and I put a lot of trust in the ToF measurements. Seeing the plot and the results, I think the KF prediction is working fine to allow the robot to predict data when there are not any available.
+
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Blooper</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>The following video is a blooper of my car drifting into the wall:</p>
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/Iw-Rk8iESxg" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+
+                    <p>Lab 8 successfully employed a Kalman Filter for the car.
+                        </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        <p>I used claude to add the capability of having colored letters in the code blocks and I referred to Aidan Derocher's and Lucca Correia's (very funny) websites for structuring this lab report.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+<script>
+  document.querySelectorAll('.code-block pre, .c-code-block, .p-code-block').forEach(block => {
+    const tagMap = { pink: 'highlight-pink', blue: 'highlight-blue', yellow: 'highlight-yellow' };
+    for (const [tag, cls] of Object.entries(tagMap)) {
+      block.querySelectorAll(tag).forEach(el => {
+        const span = document.createElement('span');
+        span.className = cls;
+        span.innerHTML = el.innerHTML;
+        el.replaceWith(span);
+      });
+    }
+  });
+</script>
+</body>
+</html>
