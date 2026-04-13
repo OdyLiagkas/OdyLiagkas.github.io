@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 9 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Code block highlight spans */
+.highlight-pink   { color: #ff79a8; }
+.highlight-blue   { color: #79c8ff; }
+.highlight-yellow { color: #ffe066; }
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 9: Mapping</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objectives</h2>
+                <div class="section-content">
+                    
+                    <ul>
+                        <li>Obtain ToF measurements from different angles in different points of world</li>
+                        <li>Transform measurements to map out a static world for the robot</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 9 Sections</h2> 
+                <div class="section-content">
+                    <ol>
+                            <li>Introduction</li>
+                            <li>Read out Distances</li>
+                            <li>Plot out Readings</li>
+                            <li>Convert to Line-Based Map</li>
+                    </ol>
+                </div>
+            </section>
+            <section class="content-section">
+                <h2 class="section-title">Introduction</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>For this lab, I did <b>Orientation Control</b>. I had the robot spin around its axis 25 degrees, take measurements and continue for the following θ values: 0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350
+                        <br><br>The angle θ was obtained via the DMP of the IMU as was set up in a previous Lab (Lab 6). To have the car do that, I made a new command case <code>OBTAIN_MAP_READINGS</code>:
+                    <div class="highlight-box"><b>NOTE:</b> because the code snippets were big, I removed sections with variables, other initializations and lines for data sending to jupyter, and replaced them with '[...]'
+                    <br><br>I also added coloring scripts for the codeblocks to make them more legible. <b>Please read the colored comments in the code.</b>
+                    </div>
+                        <div class="code-block">
+<pre>case <blue>OBTAIN_MAP_READINGS</blue>:
+    [...]
+
+    for(int i=0;i < 15;i++){<blue>//0, 25, 50, 75, 100, 125, 150, 175, 200, 225, 250, 275, 300, 325, 350</blue>
+    <pink>axiallyRotateCar(angleIncrement*i);</pink>
+        float average = 0.0;
+
+        for(int j=0;j < 10;j++){
+            tofcounter = j;//i*10 + j;
+            ToFs0[tofcounter] = ToFmeasurement();
+        }
+        average = (ToFs0[0] + ToFs0[1] + ToFs0[2] + ToFs0[3] + ToFs0[4] + ToFs0[5] + ToFs0[6] + ToFs0[7] + ToFs0[8] + ToFs[9])/10;
+    <yellow>//I could've done this with a loop but made this to test as I was planning on taking 100 measurements instead of 10.</yellow>
+    <yellow>//However, this is faster anyway so I kept it</yellow>
+        ToFs[i] = average;
+
+    }
+
+    for(int i=0;i < 15;i++){
+    [...sending (Angle, Distance) data to jupyter...]
+    break;
+</pre>
+                    </div>   
+                    <br>The function <code>axiallyRotateCar</code> is shown below, and it is basically an implementation of "rotational PID" (gains same as tuned in previous lab). 
+
+                    
+                    
+                    <div class="code-block">
+<pre>void <pink>axiallyRotateCar(float drift_angle)</pink>{ <blue>// will run until drift is successful</blue>
+    bool done=false;
+    error_i_rot = 0;
+    <yellow>while(done==false){</yellow>
+       [...]
+        if(error_i_rot>35){error_i_rot=35;}
+        else if(error_i_rot<-35){error_i_rot=-35;}
+        <blue>if(error_p_rot > 1 || error_p_rot < -1 )</blue>{
+        <yellow>//I wanted it to have as close as 0 error as possible. </yellow>
+        <pink>//The rotation was slower because of this but it was worth it</pink>
+        PWM_rot = Kp_rot * error_p_rot + Ki_rot * error_i_rot;
+        if(PWM_rot>0){PWM_rot+=155;}
+        else if(PWM_rot < 0){PWM_rot-=155;}
+            // add min value for PWM so that it moves
+            PWM_rot = constrain(PWM_rot, -255, 255);
+            rotateCar(PWM_rot);
+        }
+        else{
+            error_i_rot = 0;
+            <blue>stopCarRotation();</blue>
+            <yellow>done=true;</yellow>
+            }         
+        [...]
+    }
+}
+</pre>
+                    </div>  
+
+                    
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Read out Distances</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    
+                    <p>As per usual, I made an accompanying notification handler for Jupyter. Firstly, I tested that it worked properly on the Bench <b>(sorry Professor)</b>. The following video shows a partial rotation around the robot's axis.
+                        The reason why it seems to be getting "stuck" is the PI controller's error threshold being set to basically 0 to be regarded that it has reached its target angle. When it goes near that targer, the robot has to wait for the I term to kick-in. 
+                        As mentioned in the comments of the code earlier, this way is slower, but it is very accurate and I think it was a worthy trade-off.
+                      <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/R6ZiTdZXNrE" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                        </div>
+
+                    <p>I got the following measurements:</p>
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/bench_test.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 1: Bench Test measured distances</p>  
+                    In the form of a polar plot this is:
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/bench_test_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 2: Bench Test measured distances polar</p> 
+                    <br>In order to test how precise my scans are, I ran the same test but with the robot doing 3 circles instead of 1:
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/bech_test_triple.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 3: Bench Triple Test measured distances</p>  
+                    In the form of a polar plot this is:
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/bench_test_triple_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 4: Bench Triple Test measured distances polar</p> 
+                    <p>We can see that the first two rotations are nearly identical, which means that the robot's rotation is pretty precise.</p>
+                    <p>After this testing, it was time to move the robot into the constructed world and take ToF measurements at the given points.</p>
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/robot_in_00.jpeg" alt="Lab 9">
+                    </div>
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/cover.jpeg" alt="Lab 9">
+                    </div>                    
+                    <p>Here are a couple of videos from the robot taking the measurements and rotating around its axis:</p>
+                      <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/lossVvnfNxU" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                        </div>          
+                      <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/Qc0ZrDBKNOk" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                        </div>          
+                </div>
+            </section>
+
+
+
+
+
+            <section class="content-section">
+                <h2 class="section-title">Plot out Readings</h2>
+                <div class="section-content">
+                    <p>By this moment, I had placed the robot in all designated points and taken the ToF measurements for the specific angle increments.
+                        The way I did this is the following. I aligned my robot with the Y axis of the world (so that the ToF's reference frame's Y axis would be aligned with World's. Then, <b>because the car wouldn't be moving</b> I just said that the car's longitudinal axis was the car's Y axis too -- explained later) and then restarted it so that the dmp angle would be zero when looking at the positive Y axis.
+                    </p>
+                    <p>The measurements I got are:</p>
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/0_0.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 5: Distance Measurements at 0,0</p>  
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/0_0_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 6: Distance Measurements at 0,0 polar</p> 
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/0_3.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 7: Distance Measurements at 0,3</p>  
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/0_3_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 8: Distance Measurements at 0,3 polar</p> 
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/-3_-2.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 9: Distance Measurements at -3,-2</p>  
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/-3_-2_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 10: Distance Measurements at -3,-2 polar</p> 
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/5_-3.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 11: Distance Measurements at 5,-3 polar</p>  
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/5_-3_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 12: Distance Measurements at 5,-3 polar</p> 
+                    <div class="lab-image" style="width: 70%; max-width: 700px;">
+                        <img src="resources/Lab9/5_3.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 13: Distance Measurements at 5,3</p>  
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/5_3_polar.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 14: Distance Measurements at 5,3 polar</p> 
+                    <br>
+                    <p>All of the different measurements combined can be seen on the following plot:</p>
+
+                    <div class="lab-image" style="width: 75%; max-width: 700px;">
+                        <img src="resources/Lab9/combined_distance_plot.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 15: Combined plot of all distances at different points</p>
+                
+                    <br><br>
+                    <p>To turn these into the World's map I had to turn the measurements into positions in the World Frame. First I turned these measurements into positions in ToF's reference frame and then the car's IMU (as that is where the angle is changing for us to take the measurements)</p>
+                    <p>First I needed to measure the distance between the front ToF, which was used to take the measurements, and the center of the IMU. I measured that as 5cm=50mm=0.164042ft</p>
+                    <div class="lab-image" style="width: 75%; max-width: 700px;">
+                        <img src="resources/Lab9/front_ToF_to_IMU_distance.jpeg" alt="Lab 9">
+                    </div>
+
+                    <p>Thus, the matrix to turn a ToF position into a Car (IMU) position is:</p>
+
+                    <div class="code-block">
+<pre>
+T_car_tof = np.array([
+    [1, 0, 0],
+    [0, 1, 0.164042],
+    [0, 0, 1]
+])
+</pre>
+                    </div>  
+
+                    <p>Then, to turn that from Car to World frame as the car rotates around its axis the matrix is:</p>
+                    <div class="code-block">
+<pre>
+T_world_car = np.array([
+    [np.cos(angle), -np.sin(angle), x],
+    [np.sin(angle),  np.cos(angle), y],
+    [0, 0, 1]
+    ])
+</pre>
+                    </div> 
+                    <div class="highlight-box"><b>A couple of notes:</b>
+                        <br><br>T_car_tof is a 2D identity with the distance from the ToF frame to the center of the IMU. 
+                        <br><br>The car was rotating countercockwise, therefore the rotation was positive. Thus the signs of the rotation matrix component of the T_world_car matrix.
+                        <br><br>Because the car was only rotating and not moving, since I had aligned the car with the Y axis for θ=0, saying that the car's longitudinal axis was the car's Y axis was fine. After all the IMU's axes are for the robot to know in which direction it's moving. The IMU's and the World's Z axes are aligned either way so the rotation's angle is correct.
+                    <div class="lab-image" style="width: 60%; max-width: 700px;">
+                        <img src="resources/Lab9/IMU_axes.jpeg" alt="Lab 9">
+                    </div>
+                        <br>In future labs, I will start the car in such a way where the X and Y axes of the world are aligned with the car's for θ=0. There, the front ToF's meaurement would be in the Car's X axis and not Y. 
+                    </div>
+                    <p>Finally, I had: <code>p_world = T_world_car @ T_car_tof @ p_tof</code> where
+                    <div class="code-block">
+<pre>
+ p_tof = np.array([[0], [dist * 0.00328084], [1]])
+</pre>
+                    </div> 
+                    where we turn the distance measured into feet.</p>
+                    <p>The resulting map of the world can be seen here:</p>
+                    <div class="lab-image" style="width: 75%; max-width: 700px;">
+                        <img src="resources/Lab9/world_mapping.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 16: World Mapping</p> 
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Convert to Line-Based Map</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>To convert the map into a Line-Based map, I estimated the position of the walls/obstacles based on the plot, and my knowledge of the world (if this had to be automated I would impose constraints based on my knowledge to achieve the same map).</p>
+                    <p>The lines I ended up with are:</p>
+                    <div class="code-block">
+<pre>
+lines_start = [
+    (-5.5, -4.5),    
+    (0.5, -4.5),       
+    (6.5, -4.5),        
+    (6.5, 4.5),       
+    (-2.25, 4.5),     
+    (-2.25, 0),         
+    (-5.5, 0),      
+    
+    (-0.75, -4.5),     
+    (-0.75, -2),         
+    (0.5, -2),        
+    
+    (2.5, -0.75),     
+    (2.5, 1.75),       
+    (4.5, 1.75),  
+    (4.5, -0.75),     
+]
+lines_end = [
+    (-0.75, -4.5),   
+    (6.5, -4.5),      
+    (6.5, 4.5),       
+    (-2.25, 4.5),      
+    (-2.25, 0),      
+    (-5.5, 0),        
+    (-5.5, -4.5),      
+    
+    (-0.75, -2),     
+    (0.5, -2),         
+    (0.5, -4.5),        
+    
+    (2.5, 1.75),     
+    (4.5, 1.75),      
+    (4.5, -0.75),     
+    (2.5, -0.75)     
+]
+</pre>
+                    </div> 
+                    <p>And the final plot:</p>
+                    <div class="lab-image" style="width: 75%; max-width: 700px;">
+                        <img src="resources/Lab9/world_mapping_with_lines.png" alt="Lab 9">
+                    </div>
+                    <p class="image-caption">Plot 17: Line-Based World Mapping</p> 
+                    <p>Seeing the plot above I realize I should've taken more datapoints (more and smaller angle increments) and from more points in the world if I could make out with certainty. The result would have been much better as now I had hard time aligning (especially between (5,3) and (5,-3) ). 
+                        However, I had taken measurements and did not have time to go back to the lab unfortunately. 
+                        <br><br>Additionally, I could've also taken points from second ToF and with a different transformation matrix to take even more points</p>
+                    <p>I have already measured the position of the Side ToF sensor w.r.t. the center IMU already and it's going to be easy to implement.</p>
+                </div>
+            </section>
+
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+
+                    <p>Lab 9 successfully utilized ToF measurements and, via transformation matrices, managed to map out the world of the robot.
+                        </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        I referred to Aidan Derocher's and Lucca Correia's websites for structuring this lab report.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+<script>
+  document.querySelectorAll('.code-block pre, .c-code-block, .p-code-block').forEach(block => {
+    const tagMap = { pink: 'highlight-pink', blue: 'highlight-blue', yellow: 'highlight-yellow' };
+    for (const [tag, cls] of Object.entries(tagMap)) {
+      block.querySelectorAll(tag).forEach(el => {
+        const span = document.createElement('span');
+        span.className = cls;
+        span.innerHTML = el.innerHTML;
+        el.replaceWith(span);
+      });
+    }
+  });
+</script>
+</body>
+</html>
