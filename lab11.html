@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 11 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Code block highlight spans */
+.highlight-pink   { color: #ff79a8; }
+.highlight-blue   { color: #79c8ff; }
+.highlight-yellow { color: #ffe066; }
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 11: Localization on the real robot</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objective</h2>
+                <div class="section-content">
+                    
+                    <ul>
+                        <li>Utilizing the update step of the Bayes Filter to perform localization on my robot car.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 11 Sections</h2> 
+                <div class="section-content">
+                    <ol>
+                            <li>Introduction</li>
+                            <li>Simulation</li>
+                            <li>Robot Implementation</li>
+                            <li>Real-world Localization</li>
+                    </ol>
+                </div>
+            </section>
+            <section class="content-section">
+                <h2 class="section-title">Introduction</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>For this lab, we have the same simulation with the Bayes Filter so that our real car can perform grid localization using that Bayes Filter.
+                    <br><br>The simulation's world was discritized in a 12 by 9 by 18 grid (x,y,θ). Each x and y cell were 0.3048 meters and each θ was 20 degrees. 
+                    <div class="highlight-box">
+                        <b>RED:</b> Odometry Model based belief of where the robot is<br>
+                        <b>BLUE:</b> Probabilistic (Bayesian) Belief of where the robot is<br>
+                        <b>GREEN:</b> Ground Truth of where robot is<br>
+                        <b>SQUARES:</b> Distribution of Belief of where the robot is (only displayed in simulation)<br>
+                    </div>
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Simulation</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    
+                    <p>To make sure that the Bayes Filter was working, I ran <code>lab11_sim.ipynb</code>.
+                        <br>The resulting simulated localization while moving through our simulated world is the following:
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/simulated_localization.png" alt="Lab 11">
+                    </div>
+                    <p></p>
+
+                </p> </div>
+            </section>
+
+
+
+
+
+            <section class="content-section">
+                <h2 class="section-title">Robot Implementation</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>As far as the Artemis' code is concerned, I kept all the same code from Lab9. However, I found one typo that could explain the error present in that lab. 
+                        <br><br>Instead of taking the average of ten ToF measuremetns with:<br><code>average = (ToFs0[0] + ToFs0[1] + ToFs0[2] + ToFs0[3] + ToFs0[4] + ToFs0[5] + ToFs0[6] + ToFs0[7] + ToFs0[8] + ToFs0[9])/10;</code>, <br>I had <code>ToFs[9]</code> in the place of <code>ToFs0[9]0</code> which always returned 0 and added extra noise.
+                    </p>
+
+                    <p>Next up, was to implenent the different functions for the <code>lab11_real.ipynb</code> notebook. As mentioend earlier, I was determined to keep the code from Lab9 because I really liked how it worked. An important part is the DMP-based PI controlled rotation that gives 0 tolerance for error in terms of the target angle <b>(this will be important later)</b>.
+                        <br><br>To implement <code>perform_observation_loop()</code>, I first added my <code>mapping_handler()</code> notification handler function inside the RealRobot class. 
+                    <div class="code-block">
+<pre>def <pink>mapping_handler(self, uuid, byteArray)</pink>:
+    string = self.ble.bytearray_to_string(byteArray).strip()
+    A,D = string.split(",")
+    angle= float(A[2:]) 
+    distance = float(D[2:])
+    self.angles.append(angle)
+    self.distances.append(distance/1000) <yellow># to convert to m from mm</yellow>
+</pre>
+                    </div> 
+                        
+                        Then, I implemented it as shown below, where there is a while loop waiting for 18 measurements (which are the average of the 10 collected of the sensor).
+                        
+                    <div class="code-block">
+<pre><blue>async</blue> def <pink>perform_observation_loop(self, rot_vel=120)</pink>:
+    <yellow>self.ble.start_notify</yellow>(self.ble.uuid['RX_STRING'], <pink>self.mapping_handler</pink>)
+    print("Started notifying MAPPING data for service: RX_STRING")
+    self.ble.send_command(CMD.OBTAIN_MAP_READINGS, "")
+    while(len(self.angles) < 18):
+        <blue>await</blue> asyncio.sleep(3)
+
+    <yellow>self.ble.stop_notify</yellow>(self.ble.uuid['RX_STRING'])
+    sensor_ranges = np.array(self.distances).reshape(-1, 1)
+    sensor_bearings = np.array(self.angles).reshape(-1, 1)
+    self.angles.clear()
+    self.distances.clear()
+    return <yellow>sensor_ranges, sensor_bearings</yellow>
+</pre>
+                    </div>  
+                    I personally found the idea of implementing the lab9 code as-is really elegant. For that to happen though, I had to add the <code>async</code> and <code>awaiy</code> keywords found above. I also had to add them in <code>localization.py</code> here:
+                    <div class="code-block">
+<pre><blue>async</blue> def get_observation_data(self, rot_vel=120):
+    self.obs_range_data, self.obs_bearing_data = <blue>await</blue> self.robot.perform_observation_loop(
+        rot_vel)
+</pre>
+                    </div> 
+                and when it was called on jupyter:
+                <div class="code-block">
+                    <pre><blue>await</blue> loc.get_observation_data()</pre>
+                </div> 
+                </p> </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Real-world Localization</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    
+                    <p>After the code was set up, I placed my robot in the for marked poses in the world:
+                        <ul>
+                            <li>(-3 ft ,-2 ft ,0 deg)</li>
+                            <li>(0 ft,3 ft, 0 deg)</li>
+                            <li>(5 ft,-3 ft, 0 deg)</li>
+                            <li>(5 ft,3 ft, 0 deg)</li>
+                        </ul>
+                    And run the jupyter code. 
+                    <br><br>To print the ground truth of the point I added the following in that jupyter cell:
+                    <div class="code-block">
+<pre>gt_point = (5, 3)
+gt_x = gt_point[0]*0.3048
+gt_y = gt_point[1]*0.3048
+
+cmdr.plot_gt(gt_x, gt_y)
+</pre>
+                    </div>  
+                    where I would simply change the <code>gt_point</code> variable depending on where I placed the robot. 
+                    <br><br>Originally, I had aligned my IMU's axes with the axes of the world like so:
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/original_robot_orientation.jpg" alt="Lab 11">
+                    </div>
+                    However, after running the Bayes Filter and seeing that my belief was approximately (didn't save it then and had to make it later...):
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/gt_5_-3_wrong_orientation.png" alt="Lab 11">
+                    </div>
+                    I thought that maybe "0 degrees" wasn't with respect to the x axis was, but the y axis, and so I changed how I initialized my robot's 0 degrees to be:
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/robot_orientation.jpg" alt="Lab 11">
+                    </div>
+                    despite my robot's axes being different +90 compared to the world's, and it completely worked!
+
+                    <br><br>The results of the localization are depicted below with photos and videos:
+                    <br><br><h3>(-3 ft ,-2 ft ,0 deg)</h3>
+                    <br><h4>Ground Truth</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/gt_-3_-2.png" alt="Lab 9">
+                    </div>
+                    <br><h4>Belief</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/belief_-3_-2.png" alt="Lab 9">
+                    </div>
+                    We can see that the car can identify its location very accurately! (Was worried about in the beginning that something was wrong and that it was <b>too accurate</b> to be true. Will explain at the end of this section)
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/QeSIidzPV8Y" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+
+
+                    <br><br><h3>(0 ft,3 ft, 0 deg)</h3>
+                    <br><h4>Ground Truth</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/gt_0_3.png" alt="Lab 9">
+                    </div>
+                    <br><h4>Belief</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/belief_0_3.png" alt="Lab 9">
+                    </div>
+                    In the following video's end, we can see the probability that the robot thinks it's at the point (0,3) as well as the belief being on top of the ground truth (might have to squint for the colors)
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/1sU407_Td-Q" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+
+                    <br><br><h3>(5 ft,-3 ft, 0 deg)</h3>
+                    <br><h4>Ground Truth</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/gt_5_-3.png" alt="Lab 9">
+                    </div>
+                    <br><h4>Belief</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/belief_5_-3.png" alt="Lab 9">
+                    </div>
+
+                    <br><br><h3>(5 ft,3 ft, 0 deg)</h3>
+                    <br><h4>Ground Truth</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/gt_5_3.png" alt="Lab 9">
+                    </div>
+                    <br><h4>Belief</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/belief_5_3.png" alt="Lab 9">
+                    </div>
+                    <br><h4>Comparison in same screenshot</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/simulation_5_3.png" alt="Lab 9">
+                    </div>
+                    Given the accuracy displayed at the different points, I was originally confused by this (and a bit relieved that there wasn't something wrong with my implementation). 
+                    <br><br>One explanation for this inaccuracy is that the real world's "box" obstacle had been moved upwards a bit, and therefore my robot detected smaller distances towards it and "thought" it was closer to it.
+                    <br><br>I didn't want to move the obstacle in case I was wrong, but if I am right, the box should be aligned with the following green lines:
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab11/moved_box.jpg" alt="Lab 9">
+                    </div>
+
+                    <h3>Localization accuracy and PI comment</h3>
+                    As I mentioned above, I was a bit scared from the fact that my localization was so spot on, as Lalo Esparza's, was a bit off from the ground truth. However, after a brief discussion with him, I asked him whether he had any room for error in the target angle in his roration controller, and he said he did.
+                    <br><br>After I told him that I had set up my controller so that the robot wouldn't stop until it was at the exact target angle (thanks to the DMP's accuracy) and that I left zero room for error (at the expense of time), he did the same, and also got his belief to land exactly above the ground truth, which relieved me. The professor was right that we should be more social.
+                </p> </div>
+            </section>
+
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+
+                    <p>Lab 11 successfully implemented Bayes Filter on the actual robot to perform Grid Localization in a real-world arena.
+                        </p>
+                    
+                    <div class="highlight-box">
+                        <h4>Collaboration</h4>
+                        I referred to Lucca Correia's website for structuring this lab report.<br><br>
+                        Had a conversation with Lalo Esparza (had to look through the student websites to find his name 🤐)
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+<script>
+  document.querySelectorAll('.code-block pre, .c-code-block, .p-code-block').forEach(block => {
+    const tagMap = { pink: 'highlight-pink', blue: 'highlight-blue', yellow: 'highlight-yellow' };
+    for (const [tag, cls] of Object.entries(tagMap)) {
+      block.querySelectorAll(tag).forEach(el => {
+        const span = document.createElement('span');
+        span.className = cls;
+        span.innerHTML = el.innerHTML;
+        el.replaceWith(span);
+      });
+    }
+  });
+</script>
+</body>
+</html>
