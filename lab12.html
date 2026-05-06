@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 12 - Fast Robots | Odyssefs Liagkas</title>
+    <meta name="description" content="Lab 3: Time of Flight distance sensors.">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <style>
+
+/* Code block highlight spans */
+.highlight-pink   { color: #ff79a8; }
+.highlight-blue   { color: #79c8ff; }
+.highlight-yellow { color: #ffe066; }
+
+/* Base code block style */
+.c-code-block, .p-code-block {
+    background: #1e1e1e; /* VS Code Dark Theme Background */
+    color: #d4d4d4;
+    padding: 1rem;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 1.5rem 0;
+    white-space: pre;
+}
+
+/* C++ Syntax */
+.c-code-block .keyword { color: #569CD6; font-weight: 600; }
+.c-code-block .type { color: #4EC9B0; }
+.c-code-block .number { color: #B5CEA8; }
+.c-code-block .string { color: #CE9178; }
+.c-code-block .comment { color: #6A9955; font-style: italic; }
+.c-code-block .preprocessor { color: #C586C0; }
+
+/* Python Syntax */
+.p-code-block .keyword { color: #569CD6; font-weight: 600; }
+.p-code-block .builtin { color: #4EC9B0; }
+.p-code-block .number { color: #B5CEA8; }
+.p-code-block .string { color: #CE9178; }
+.p-code-block .comment { color: #6A9955; font-style: italic; }
+
+
+
+        /* Import base styles */
+        :root {
+            --primary-navy: #1a2332;
+            --secondary-copper: #c17817;
+            --accent-sage: #7a8471;
+            --neutral-warm: #faf9f7;
+            --text-charcoal: #2d3748;
+            --text-light: #ffffff;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
+            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            line-height: 1.6;
+            color: var(--text-charcoal);
+            background-color: var(--neutral-warm);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 35, 50, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: var(--transition-smooth);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition-smooth);
+            position: relative;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--secondary-copper);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--secondary-copper);
+            transition: var(--transition-smooth);
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Lab Header */
+        .lab-header {
+            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
+            color: var(--text-light);
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .lab-header h1 {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3rem);
+            margin-bottom: 1rem;
+        }
+
+        .lab-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Lab Content Sections */
+        .lab-content {
+            padding: 3rem 0;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--secondary-copper);
+        }
+
+        .section-content {
+            line-height: 1.8;
+            color: var(--text-charcoal);
+        }
+
+        .section-content p {
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .lab-image {
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .lab-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--accent-sage);
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        /* Video Container */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding-bottom: 40%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        /* Inline Code */
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--secondary-copper);
+        }
+
+        /* Two Column Layout for Images */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-grid .lab-image {
+            margin: 0;
+        }
+
+        /* Highlight Box */
+        .highlight-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-copper);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .highlight-box h4 {
+            color: var(--primary-navy);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Back Button */
+        .back-section {
+            text-align: center;
+            padding: 2rem 0 4rem;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: var(--secondary-copper);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+        }
+
+        .back-button:hover {
+            background: var(--primary-navy);
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary-navy);
+            color: var(--text-light);
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-copper);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Animation Classes */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: var(--transition-smooth);
+        }
+
+        .animate-on-scroll.animate-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Odyssefs Liagkas</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="fast_robots.html" class="active">Fast Robots Labs</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Lab Header -->
+    <header class="lab-header">
+        <div class="container">
+            <br><br><h1>Lab 12: Path Planning and Execution</h1>
+        </div>
+    </header>
+
+    <!-- Lab Content -->
+    <main class="main-content">
+        <div class="container">
+            
+            <!-- Objectives Section -->
+            <section class="content-section">
+                <h2 class="section-title">Objective</h2>
+                <div class="section-content">
+                    
+                    <ul>
+                        <li>Utilizing the update step of the Bayes Filter to perform localization on my robot car.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="content-section">
+                <h2 class="section-title">Lab 12 Sections</h2> 
+                <div class="section-content">
+                    <ol>
+                            <li>Introduction</li>
+                            <li>Artemis Code</li>
+                            <li>Jupyter Code</li>
+                            <li>Execution</li>
+                    </ol>
+                </div>
+            </section>
+            <section class="content-section">
+                <h2 class="section-title">Introduction</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>This lab was very open ended. The goal of it was to have the robot navigate through the given waypoints to maneuver around the obstacle in the world.
+                    <br><br>As I have mentioned in previous write-ups, I really enjoy reusing past code, as I intentionally design it in a way so that it is useful for later (or at least try). More specifically, I used the following code exactly as it was made from previous labs.
+                    <div class="highlight-box">
+                        <b>Rotational and Linear Movement/Stopping of car</b> Commands to have robot start moving and stopping with active breaking<br>
+                        <b>Rotational PI</b> To have the robot turn to specific angle increments around itself utilizing the Artemis' DMP to obtain yaw<br>
+                        <b>Obtaining of Map readings</b> Getting 10 ToF measurements for each angle increment, averaging them and sending them to jupyter<br>
+                        <b>Localization</b> For the robot to use the ToF measurements and get a belief of where it is in the world<br>
+                    </div>
+                    I did write extra code, and modified the Rotational PI in an extremely minimal way that will be discussed below. The approach I had with going through this lab is that I wanted to determine how to have the car move approximately 1ft so that I can change it for different distances.
+                    Then, I wanted to see if I could have the robot complete the navigation without any continuous sensory input. If I could turn time back (and have more of it), I would definitely add continuous ToF feedback to assist in determining the distance traveled (spoiler for later).
+                    <br><br><b>I would also change the way I handled my PI controlled rotation</b> (explained why below).
+                    </p>
+                    <p>The following waypoints were given to us that dictate the route shown below:
+                    <div class="lab-image" style="width: 80%; max-width: 200px;">
+                        <img src="resources/Lab12/waypoints.png" alt="Lab 12">
+                    </div>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/Trajectory.png" alt="Lab 12">
+                    </div>
+                    </p>
+                </div>
+            </section>
+
+
+            <!-- Tasks' Proof Section template -->
+            <section class="content-section">
+                <h2 class="section-title">Artemis Code</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    
+                    <p>As mentioned above, specific code blocks were used exactly as they were previously made. The only change to the PI rotation was that I changed the followin line:<br><code>if(error_p_rot > 1 || error_p_rot < -1 ){</code>, which pretty much allowed no error in the rotation, to:
+                        <br><code>if(error_p_rot > 2 || error_p_rot < -2 ){</code>, which allowed for an error in what I defined as the point that the PI controller has reached the target angle.
+                        <br><br>To make all my previously written code usable from inside the notebook where the localization was run, I made the following two cases inside of Artemis' code:
+                    <div class="code-block">
+<pre>case <yellow>ALIGN_ROBOT</yellow>:
+
+    success = robot_cmd.get_next_value(<pink>goal_angle</pink>);
+    if (!success)
+        return;
+
+    <blue>axiallyRotateCar</blue>(<pink>goal_angle</pink>);
+
+    tx_estring_value.clear();
+    tx_estring_value.append("DONE");                         
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+break;
+</pre>
+                    </div> 
+                    Where <code>acuallyRotateCar</code>, is the PI controlled rotation to the target angle. The case above, is meant to align the robot to a specific yaw value.
+                    <br>
+                    <div class="code-block">
+<pre>case <yellow>MOVE_ROBOT</yellow>:
+
+    success = robot_cmd.get_next_value(<pink>PWM</pink>);
+    if (!success)
+        return;
+
+    success = robot_cmd.get_next_value(<pink>DELAY_MS</pink>);
+    if (!success)
+        return;
+
+    success = robot_cmd.get_next_value(<yellow>cali</yellow>);
+    if (!success)
+        return;
+
+    <blue>moveCar</blue>(<pink>PWM</pink>);<blue>delay</blue>(<pink>DELAY_MS</pink>);<blue>stopFast</blue>();
+    tx_estring_value.clear();
+    tx_estring_value.append("DONE");                         
+    tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+break;
+</pre>
+</div> 
+                    Where <code>cali</code> is a callibration number to boost the left wheel's PWM in order for the car to move in a straight line. (Originally it was good, then it needed callibration after I had to resolder a new motor driver, and over time my car degraded even more)
+                    <br><br>I used this method in order to also use this case to determine the current calibration number, and delay for my car to move 1ft ahead in a straight line.
+                    <div class="highlight-box">
+                    <b>Note:</b>originally, this was accurate when I got the numbers so I didn not add extra safeguards for determining how much the robot had traveled. However, after the battery levels dropped and I fully charged it, the robot was overshooting the distance a bit... That made it very hard for the robot to navigate the waypoints in the bottom right corner.
+                    <br>One way I managed to work around this was to comment out the following way point, remembering that the goal was to have the car to navigate around the obstacle and follow the general route, thinking that the robot would still go to the top right waypoint:
+                    <div class="code-block">
+                        <pre>
+waypoints_in_feet = [
+(-4, -3),
+(-2, -1),
+(1, -1),
+(2, -3),
+(5, -3),
+<blue>#(5, -2)</blue>,
+(5, 3),
+(0, 3),
+(0, 0)      
+]</pre>
+                    </div>
+                    </div>
+                    Everything else was taken care of from within the Jupyter Notebook.
+                </p> </div>
+            </section>
+
+
+
+
+
+            <section class="content-section">
+                <h2 class="section-title">Jupyter Code</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    <p>The first thing I had to do in order to utilize our localization code, was to be able to gain the believed location of the robot, after the update step of the Bayes Filter. I did this with:
+                    <div class="code-block">
+<pre><yellow>robot_belief_meters</yellow> = (loc.mapper.from_map(*get_max(loc.bel)[0])[0], 
+    loc.mapper.from_map(*get_max(loc.bel)[0])[1])
+
+<pink>robot_belief_feet</pink> = (round(<yellow>robot_belief_meters[0]</yellow> / 0.3048),
+round(<yellow>robot_belief_meters[1]</yellow> / 0.3048))  
+</pre>
+                    </div> 
+                    As is evident from the existence of two lines, I had to take into consideration the fact that the localization was in meters, while our real world was in feet. <br>These, return a tuple (X , Y)
+                    </p>
+                    <p>Then, I made a function to obtain the angle and the distance between two points, that would be the point of current position, and the point of the goal position:
+                    <div class="code-block">
+<pre>def <yellow>get_angle(p1, p2)</yellow>:
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    rads = math.atan2(-dx, dy)
+    degs = math.degrees(rads)
+    return degs % 360
+    
+def <blue>angle_and_dist</blue>(curr_point, next_point):  # assumes robo is at 0 degrees
+    dist = math.dist(curr_point, next_point)
+    angle = <yellow>get_angle(curr_point, next_point)</yellow>
+    if(angle>180):
+        angle=angle-360
+    return angle, dist
+</pre>
+                    </div> 
+                    <div class="highlight-box">
+                    I made it so that it assumed that the robot is at 0 degrees (aka aligned with Y axis of world as was defined in previous lab), becasue I had the robot go there after each localization ToF reading sequence (observation loop).
+                    <br>Also, made the angle=angle-360 if the angle was above 180, so that I would be able to test it more easily with prints for debugging. It will be shown later how it works.
+                    </div>
+                </p>
+
+
+                    <p>Next up, was to edit the Real Robot class. It already had the <code>perform_observatoin_loop</code> and the <code>mapping_handler</code> functions, so here are the edits colored:
+                    <div class="code-block">
+<pre>class RealRobot():
+    def __init__(self, commander, ble):
+        self.world_config = os.path.join(str(pathlib.Path(os.getcwd()).parent)
+                                            , "config", "world.yaml")
+        self.config_params = load_config_params(self.world_config)
+        self.cmdr = commander
+
+        # ArtemisBLEController to communicate with the Robot
+        self.ble = ble
+        self.angles = []
+        self.distances = []
+        <blue>self.status = "WAITING"</blue>
+
+    async def perform_observation_loop(self, rot_vel=120):
+        self.ble.start_notify(self.ble.uuid['RX_STRING'], self.mapping_handler)
+        print("Started notifying MAPPING data for service: RX_STRING")
+        self.ble.send_command(CMD.OBTAIN_MAP_READINGS, "")
+        while(len(self.angles) < 18):
+            await asyncio.sleep(3)
+        self.ble.stop_notify(self.ble.uuid['RX_STRING'])
+        sensor_ranges = np.array(self.distances).reshape(-1, 1)
+        sensor_bearings = np.array(self.angles).reshape(-1, 1)
+        self.angles.clear()
+        self.distances.clear()
+        return sensor_ranges, sensor_bearings
+
+    <pink>async def align_robot(self, goal_angle=0)</pink>:
+        <yellow>self.ble.start_notify(self.ble.uuid['RX_STRING'], self.execution_handler)</yellow>
+        <blue>self.ble.send_command(CMD.ALIGN_ROBOT, f"{goal_angle}")</blue>
+        <yellow>while(self.status != "DONE")</yellow>:
+            await asyncio.sleep(1)
+        <blue>self.ble.stop_notify(self.ble.uuid['RX_STRING'])</blue>
+        self.status = "WAITING"
+
+    <pink>def move_robot(self, distance=1)</pink>:
+        times = int(distance)
+        remainder = distance - times
+        for _ in range(times):
+            <blue>self.ble.send_command(CMD.MOVE_ROBOT, f"100|395|14")</blue>
+            sleep(0.450)
+        if remainder > 0:
+            partial_distance = int(remainder * 395)
+            <blue>self.ble.send_command(CMD.MOVE_ROBOT, f"100|{partial_distance}|14")</blue>
+            sleep((remainder * 395 / 1000) + 0.150)
+    
+    def mapping_handler(self, uuid, byteArray):
+        string = self.ble.bytearray_to_string(byteArray).strip()
+        A,D = string.split(",")
+        angle= float(A[2:]) 
+        distance = float(D[2:])
+        self.angles.append(angle)
+        self.distances.append(distance/1000) # to convert to m from mm
+
+    <yellow>def execution_handler(self, uuid, byteArray):</yellow>
+        string = self.ble.bytearray_to_string(byteArray).strip()
+        <blue>self.status = string</blue>
+</pre>
+                    </div> 
+                        <code>move_robot</code> moves the robot 1*X ft in a "discretized" way of 1ft each time, and then moves the robot for the remainder of the distance (the decimal part) by using the <b>MOVE_ROBOT</b> command.<br>
+                        <code>align_robot</code> makes the robot align with the target angle usign the <b>ALIGN_ROBOT</b> command.<br>
+                        <code>execution_handler</code> allows the robot to update its status to "DONE" after the Artemis sends it, following a successful alightment with target angle.
+                    </p> 
+                
+                    <p>The code to make the robot do everything is presented here:
+                    <div class="code-block">
+<pre>current_loc = (-4,-3) <yellow># original starting point</yellow>
+<blue>cmdr.plot_bel(current_loc[0]*0.3048, current_loc[1]*0.3048)</blue> 
+<yellow># To print it in meters as it is in the localization notebook</yellow>
+<pink>for index in range(len(waypoints_in_feet)-1):
+    index +=1
+    print(f"**Current Location: {current_loc}")
+    print(f"&&Going to: {waypoints_in_feet[index]}")</pink>
+    dtheta_dxy = angle_and_dist(current_loc,waypoints_in_feet[index])
+
+    dtheta = dtheta_dxy[0]
+    dxy = abs(dtheta_dxy[1])
+    <yellow>
+    if(dtheta < 0):
+        await robot.align_robot(360+dtheta)
+        await robot.align_robot(360+dtheta)
+    else:
+        await robot.align_robot(dtheta)
+        await robot.align_robot(dtheta)
+    </yellow>
+    <pink>robot.move_robot(dxy)</pink>
+    <yellow>
+    if(dtheta < 0):
+        await robot.align_robot(359)
+        await robot.align_robot(0)
+    else:
+        await robot.align_robot(0) 
+        await robot.align_robot(0)
+    </yellow>
+    <blue>
+    # Get Observation Data by executing a 360 degree rotation motion
+    await loc.get_observation_data()
+
+    # Run Update Step
+    loc.update_step()
+    loc.plot_update_step_data(plot_data=True)
+    </blue>
+    # (x,y)
+    robot_belief_meters = (loc.mapper.from_map(*get_max(loc.bel)[0])[0], 
+                            loc.mapper.from_map(*get_max(loc.bel)[0])[1])
+    robot_belief_feet = (round(robot_belief_meters[0] / 0.3048),
+                        round(robot_belief_meters[1] / 0.3048)) 
+    <pink>current_loc = robot_belief_feet</pink>
+    await robot.align_robot(359)
+    await robot.align_robot(0)
+</pre>
+                    </div> 
+                    To move from one point to the next, the robot aligns with the angle, moves, and then aligns with 0 so that it performs the next observation loop.<br><br>
+                    I have <code>awat robot.align</code> twice each time, because I observed that (the way I had set up my PI controller), sometimes, while rotating, the sensor might capture the angle where error=0 and assume the robot has reached the target angle, but the momentum moves the car away from it a bit. 
+                    The second call of that, is meant to <b>ensure</b> that it will go to the target angle, as the overshoot is so small, that the proportional error does not allow for overshooting the second time.
+                    <div class="highlight-box">
+                    Additionally, when the angle was calculated above 180 (which I had made to be given as negative from the angle_and_dist function) the robot is first aligned to 359 isntead of 0 so that the proportional error is smaller and the robot doesn't overshoot as much. Then, the second call of <code>await robot.align</code> safely takes it to 0.<br><br>
+                    The final two calls: <code>await robot.align_robot(359)</code> and <code>await robot.align_robot(0)</code> at the end of the code block are that way, because at the end of the observation loop, the robot is at -20 degrees (aka 340).
+                    </div>
+                </p>
+                </div>
+            </section>
+
+            <section class="content-section">
+                <h2 class="section-title">Execution</h2>
+                <div class="section-content">
+                    <!--<h3>Step 1: Environment Setup</h3>-->
+                    
+                    <p>After all this theoretical talk, it's time for the reveal of the reults. This is the video of a complete run with the code presented above. I had other runs with the extra waypoint as well as other small differences (PI controller without error "slack" - took a lot more time to converge to target angle but didn't have the overshoot problem as much), but since the videos are long, I am not including them.
+                        <br>For the same reason, <b>please open up the video in a new tab by clicking the YouTube button on the bottom right corner of the video frame</b> so that you can watch it in high resolution and faster playback speed. I am showing all the updates to the localization in real time as well as the beliefs.
+                    <div class="video-container">
+                        <iframe 
+                            src="https://www.youtube.com/embed/1xpnHsx3uEs" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <div class="highlight-box">
+                    One bad thing about my approach is that, since I use the points to guide the robot, because of the fact that the world is discretized into grids, the caluclated angle between current point and goal point can be off, due to the localization outputting a point that does not reflect the true location of the robot. That is clear after the last observation loop where the robot is believed to be between the 2nd and 3rd waypoints, when in reality it is closer to the goal waypoint.
+                    <br>That, combined with the noise in the movement of the robot, made for some not optimal navigation. Especially the angle, which can make the robot go to a substantially wrong position when moving relatively far.
+                    </div>
+
+                    <br><h3>Original Trajectory</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/Trajectory.png" alt="Lab 9">
+                    </div>
+                    <h3>Belief</h4>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/beliefs.png" alt="Lab 9">
+                    </div>
+
+                    Here are some sequential photos from an unsuccessful run where the robot can be seen going to the waypoint that I later commented out, as well as its belief on where it is.
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/1.jpg" alt="Lab 9">
+                    </div>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/2.jpg" alt="Lab 9">
+                    </div>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/3.jpg" alt="Lab 9">
+                    </div>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/4.jpg" alt="Lab 9">
+                    </div>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/5.jpg" alt="Lab 9">
+                    </div>
+                    <div class="lab-image" style="width: 80%; max-width: 700px;">
+                        <img src="resources/Lab12/6.jpg" alt="Lab 9">
+                    </div>
+
+                </p> </div>
+            </section>
+
+
+            <!-- Discussion Section -->
+            <section class="content-section">
+                <h2 class="section-title">Discussion</h2>
+                <div class="section-content">
+
+                    <p>Lab 12 successfully utilized previously learned material to make robot navigate a real-world arena.</p>
+                    
+                    <div class="highlight-box">
+                        <h4>Appreciation Note</h4>
+                        I would like to take a bit of time to thank the Professor and the TAs for the wonderful teaching experience.
+                        <br><br>
+                        <h4>Collaboration</h4>
+                        I referred to Lucca Correia's website for structuring this lab report.<br><br>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Back Button -->
+            <div class="back-section">
+                <a href="fast_robots.html" class="back-button">← Back to All Labs</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="index.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="contact.html">Contact</a>
+                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
+            </div>
+            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation Script -->
+    <script>
+        // Simple scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+<script>
+  document.querySelectorAll('.code-block pre, .c-code-block, .p-code-block').forEach(block => {
+    const tagMap = { pink: 'highlight-pink', blue: 'highlight-blue', yellow: 'highlight-yellow' };
+    for (const [tag, cls] of Object.entries(tagMap)) {
+      block.querySelectorAll(tag).forEach(el => {
+        const span = document.createElement('span');
+        span.className = cls;
+        span.innerHTML = el.innerHTML;
+        el.replaceWith(span);
+      });
+    }
+  });
+</script>
+</body>
+</html>
