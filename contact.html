@@ -5,682 +5,347 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact - Odyssefs Liagkas</title>
     <meta name="description" content="Get in touch with Odyssefs Liagkas for research collaborations, professional opportunities, and academic discussions.">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Core Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    
     <style>
-        /* Import base styles */
         :root {
-            --primary-navy: #1a2332;
-            --secondary-copper: #c17817;
-            --accent-sage: #7a8471;
-            --neutral-warm: #faf9f7;
-            --text-charcoal: #2d3748;
-            --text-light: #ffffff;
-            
-            --font-display: 'Playfair Display', serif;
-            --font-body: 'Inter', sans-serif;
-            
-            --shadow-soft: 0 4px 20px rgba(26, 35, 50, 0.1);
-            --shadow-medium: 0 8px 30px rgba(26, 35, 50, 0.15);
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --navy:      #1a2332;
+            --navy-mid:  #243040;
+            --copper:    #c17817;
+            --copper-lt: #d99a3f;
+            --sage:      #7a8471;
+            --cream:     #faf9f7;
+            --cream-2:   #f3f0eb;
+            --charcoal:  #2d3748;
+            --white:     #ffffff;
+            --rule:      rgba(26,35,50,0.10);
+            --font-serif: 'Playfair Display', Georgia, serif;
+            --font-sans:  'DM Sans', system-ui, sans-serif;
+            --font-mono:  'DM Mono', monospace;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --t3: all 0.3s var(--ease);
         }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body { font-family:var(--font-sans); background:var(--cream); color:var(--charcoal); line-height:1.65; overflow-x:hidden; }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* NAV */
+        nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(26,35,50,0.96); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid rgba(193,120,23,0.15); height:68px; display:flex; align-items:center; }
+        .nav-inner { max-width:1240px; width:100%; margin:0 auto; padding:0 2rem; display:flex; justify-content:space-between; align-items:center; }
+        .logo { font-family:var(--font-serif); font-size:1.35rem; font-weight:600; color:var(--white); text-decoration:none; letter-spacing:0.01em; }
+        .logo span { color:var(--copper); }
+        .nav-links { display:flex; list-style:none; gap:2.25rem; }
+        .nav-links a { color:rgba(255,255,255,0.8); text-decoration:none; font-size:0.88rem; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; transition:var(--t3); position:relative; padding-bottom:2px; }
+        .nav-links a::after { content:''; position:absolute; bottom:0; left:0; width:0; height:1.5px; background:var(--copper); transition:width 0.3s var(--ease); }
+        .nav-links a:hover, .nav-links a.active { color:var(--white); }
+        .nav-links a:hover::after, .nav-links a.active::after { width:100%; }
 
-        body {
-            font-family: var(--font-body);
-            line-height: 1.6;
-            color: var(--text-charcoal);
-            background-color: var(--neutral-warm);
-            overflow-x: hidden;
+        /* HERO */
+        .hero {
+            margin-top:68px;
+            background:var(--navy);
+            padding:5.5rem 2rem 4.5rem;
+            position:relative; overflow:hidden;
+            text-align:center;
         }
+        .hero::before {
+            content:''; position:absolute; inset:0;
+            background:
+                radial-gradient(ellipse 70% 60% at 75% -5%, rgba(193,120,23,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 70% at -5% 105%, rgba(122,132,113,0.09) 0%, transparent 55%);
+            pointer-events:none;
+        }
+        .hero-inner { position:relative; z-index:1; max-width:680px; margin:0 auto; }
+        .hero-eyebrow { display:inline-flex; align-items:center; gap:0.6rem; font-size:0.75rem; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; color:var(--copper); margin-bottom:1.25rem; }
+        .hero-eyebrow::before, .hero-eyebrow::after { content:''; display:block; width:22px; height:1.5px; background:var(--copper); }
+        .hero h1 { font-family:var(--font-serif); font-size:clamp(2.8rem,5vw,4rem); color:var(--white); font-weight:700; line-height:1.1; margin-bottom:1.25rem; }
+        .hero h1 em { font-style:italic; color:var(--copper-lt); }
+        .hero-desc { font-size:1.05rem; color:rgba(255,255,255,0.68); line-height:1.75; }
 
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(26, 35, 50, 0.95);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 1rem 0;
-            transition: var(--transition-smooth);
-        }
+        /* LAYOUT */
+        .page { max-width:1240px; margin:0 auto; padding:0 2rem; }
+        section.content { padding:5.5rem 0; }
+        section.content.alt { background:var(--cream-2); }
+        .section-label { font-size:0.75rem; font-weight:600; letter-spacing:0.15em; text-transform:uppercase; color:var(--copper); display:flex; align-items:center; gap:0.7rem; margin-bottom:0.75rem; }
+        .section-label::before { content:''; display:block; width:20px; height:1.5px; background:var(--copper); }
+        .section-h { font-family:var(--font-serif); font-size:clamp(1.9rem,3.5vw,2.8rem); color:var(--navy); margin-bottom:2.5rem; font-weight:700; }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        /* CONTACT GRID */
+        .contact-wrap { display:grid; grid-template-columns:1fr 1.1fr; gap:2.5rem; align-items:start; }
 
-        .logo {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-light);
-            text-decoration: none;
+        /* CONTACT INFO PANEL */
+        .info-panel {
+            background:var(--navy);
+            border-radius:20px; padding:2.5rem;
+            color:var(--white); position:relative; overflow:hidden;
         }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
+        .info-panel::after {
+            content:''; position:absolute; right:-50px; bottom:-50px;
+            width:200px; height:200px; border-radius:50%;
+            background:rgba(193,120,23,0.07); border:1px solid rgba(193,120,23,0.15);
+            pointer-events:none;
         }
-
-        .nav-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition-smooth);
-            position: relative;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--secondary-copper);
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--secondary-copper);
-            transition: var(--transition-smooth);
-        }
-
-        .nav-links a:hover::after,
-        .nav-links a.active::after {
-            width: 100%;
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-top: 80px;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* Hero Section */
-        .page-hero {
-            background: linear-gradient(135deg, var(--primary-navy) 0%, #2a3441 100%);
-            color: var(--text-light);
-            padding: 4rem 0;
-            text-align: center;
-        }
-
-        .page-hero h1 {
-            font-family: var(--font-display);
-            font-size: clamp(2.5rem, 5vw, 4rem);
-            margin-bottom: 1rem;
-        }
-
-        .page-hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Contact Section */
-        .contact-section {
-            padding: 4rem 0;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 3rem;
-            align-items: start;
-        }
-
-        /* Contact Information */
-        .contact-info {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .info-title {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            color: var(--primary-navy);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
+        .info-panel-title { font-family:var(--font-serif); font-size:1.6rem; font-weight:700; margin-bottom:0.35rem; }
+        .info-panel-sub { font-size:0.88rem; color:rgba(255,255,255,0.5); margin-bottom:2rem; }
 
         .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 15px;
-            transition: var(--transition-smooth);
+            display:flex; gap:1rem; align-items:flex-start;
+            padding:1.1rem 1.25rem; border-radius:12px;
+            background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);
+            margin-bottom:0.85rem; transition:var(--t3);
+        }
+        .contact-item:last-child { margin-bottom:0; }
+        .contact-item:hover { background:rgba(255,255,255,0.09); transform:translateX(4px); }
+        .ci-icon {
+            width:40px; height:40px; border-radius:10px; flex-shrink:0;
+            background:rgba(193,120,23,0.18); display:flex; align-items:center; justify-content:center;
+            font-size:1.1rem;
+        }
+        .ci-label { font-size:0.72rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.3rem; }
+        .ci-value { font-size:0.9rem; color:rgba(255,255,255,0.85); }
+        .ci-value a { color:var(--copper-lt); text-decoration:none; transition:color 0.2s; }
+        .ci-value a:hover { color:var(--white); }
+        .ci-value .line { display:block; }
+
+        /* AREAS OF INTEREST */
+        .areas-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.85rem; margin-top:1.75rem; }
+        .area-chip {
+            background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px; padding:0.9rem 1rem;
+        }
+        .area-chip .name { font-size:0.88rem; font-weight:600; color:rgba(255,255,255,0.85); margin-bottom:0.2rem; }
+        .area-chip .desc { font-size:0.78rem; color:rgba(255,255,255,0.45); }
+
+        /* MESSAGE PANEL */
+        .msg-panel {
+            background:var(--white); border-radius:20px;
+            border:1px solid var(--rule); padding:2.5rem;
+        }
+        .msg-panel-title { font-family:var(--font-serif); font-size:1.6rem; font-weight:700; color:var(--navy); margin-bottom:0.35rem; }
+        .msg-panel-sub { font-size:0.88rem; color:var(--sage); margin-bottom:2rem; }
+
+        .form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .form-group { margin-bottom:1.25rem; }
+        .form-label { display:block; font-size:0.8rem; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:var(--navy); margin-bottom:0.5rem; }
+        .form-input, .form-textarea, .form-select {
+            width:100%; padding:0.85rem 1rem;
+            border:1.5px solid rgba(26,35,50,0.12); border-radius:10px;
+            font-family:var(--font-sans); font-size:0.95rem; color:var(--charcoal);
+            background:var(--cream); transition:var(--t3);
+            appearance:none;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline:none; border-color:var(--copper);
+            box-shadow:0 0 0 3px rgba(193,120,23,0.12);
+            background:var(--white);
+        }
+        .form-textarea { resize:vertical; min-height:130px; }
+        .form-btn {
+            width:100%; padding:0.95rem 2rem;
+            background:var(--copper); color:var(--white);
+            border:none; border-radius:10px;
+            font-family:var(--font-sans); font-size:0.95rem; font-weight:600;
+            cursor:pointer; transition:var(--t3); letter-spacing:0.02em;
+        }
+        .form-btn:hover { background:var(--navy); transform:translateY(-2px); box-shadow:0 8px 28px rgba(26,35,50,0.18); }
+        .form-note { font-size:0.78rem; color:var(--sage); text-align:center; margin-top:0.75rem; }
+
+        .success-msg {
+            display:none; background:#ecfdf5; border:1px solid #6ee7b7;
+            color:#065f46; padding:1rem; border-radius:10px;
+            text-align:center; font-weight:600; margin-top:1rem; font-size:0.9rem;
         }
 
-        .contact-item:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-soft);
-        }
+        /* FOOTER */
+        footer { background:var(--navy); border-top:1px solid rgba(255,255,255,0.06); color:rgba(255,255,255,0.6); padding:2.5rem 2rem; text-align:center; }
+        .footer-links { display:flex; justify-content:center; gap:2.5rem; list-style:none; margin-bottom:1rem; flex-wrap:wrap; }
+        .footer-links a { color:rgba(255,255,255,0.55); text-decoration:none; font-size:0.88rem; transition:color 0.2s; }
+        .footer-links a:hover { color:var(--copper); }
+        footer p { font-size:0.82rem; }
 
-        .contact-icon {
-            width: 50px;
-            height: 50px;
-            background: var(--secondary-copper);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: white;
-            flex-shrink: 0;
-        }
+        /* ANIMATIONS */
+        .fade-up { opacity:0; transform:translateY(28px); transition:opacity 0.65s var(--ease), transform 0.65s var(--ease); }
+        .fade-up.in { opacity:1; transform:translateY(0); }
 
-        .contact-details h3 {
-            color: var(--primary-navy);
-            margin-bottom: 0.5rem;
-        }
-
-        .contact-details p {
-            color: var(--accent-sage);
-            font-weight: 500;
-        }
-
-        .contact-details a {
-            color: var(--secondary-copper);
-            text-decoration: none;
-            transition: var(--transition-smooth);
-        }
-
-        .contact-details a:hover {
-            color: var(--primary-navy);
-        }
-
-        /* Contact Form */
-        .contact-form {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .form-title {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            color: var(--primary-navy);
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--primary-navy);
-            font-weight: 600;
-        }
-
-        .form-input,
-        .form-textarea {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: var(--font-body);
-            font-size: 1rem;
-            transition: var(--transition-smooth);
-        }
-
-        .form-input:focus,
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--secondary-copper);
-            box-shadow: 0 0 0 3px rgba(193, 120, 23, 0.1);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 120px;
-        }
-
-        .form-button {
-            width: 100%;
-            padding: 1rem 2rem;
-            background: var(--secondary-copper);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-family: var(--font-body);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-smooth);
-        }
-
-        .form-button:hover {
-            background: var(--primary-navy);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        /* Professional Networks */
-        .networks-section {
-            padding: 4rem 0;
-            background: #f8f9fa;
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: clamp(2rem, 4vw, 3rem);
-            margin-bottom: 3rem;
-            color: var(--primary-navy);
-            text-align: center;
-        }
-
-        .networks-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .network-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow-soft);
-            text-align: center;
-            transition: var(--transition-smooth);
-        }
-
-        .network-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .network-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--secondary-copper);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .network-title {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            color: var(--primary-navy);
-            margin-bottom: 1rem;
-        }
-
-        .network-description {
-            margin-bottom: 1.5rem;
-            opacity: 0.8;
-        }
-
-        .network-link {
-            display: inline-block;
-            padding: 0.8rem 1.5rem;
-            background: var(--secondary-copper);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: var(--transition-smooth);
-        }
-
-        .network-link:hover {
-            background: var(--primary-navy);
-            transform: translateY(-2px);
-        }
-
-        /* Collaboration Section */
-        .collaboration-section {
-            padding: 4rem 0;
-        }
-
-        .collaboration-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .collaboration-title {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            color: var(--primary-navy);
-            margin-bottom: 2rem;
-        }
-
-        .collaboration-description {
-            font-size: 1.1rem;
-            line-height: 1.7;
-            margin-bottom: 3rem;
-            opacity: 0.9;
-        }
-
-        .collaboration-areas {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .collaboration-area {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: var(--shadow-soft);
-            transition: var(--transition-smooth);
-        }
-
-        .collaboration-area:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .area-name {
-            font-weight: 600;
-            color: var(--primary-navy);
-            margin-bottom: 0.5rem;
-        }
-
-        .area-description {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-
-        /* Footer */
-        footer {
-            background: var(--primary-navy);
-            color: var(--text-light);
-            text-align: center;
-            padding: 2rem 0;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .footer-links a {
-            color: var(--text-light);
-            text-decoration: none;
-            transition: var(--transition-smooth);
-        }
-
-        .footer-links a:hover {
-            color: var(--secondary-copper);
-        }
-
-        /* Success Message */
-        .success-message {
-            background: #10b981;
-            color: white;
-            padding: 1rem;
-            border-radius: 10px;
-            margin-top: 1rem;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .container {
-                padding: 0 1rem;
-            }
-
-            .contact-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .contact-info,
-            .contact-form {
-                padding: 2rem;
-            }
-        }
-
-        /* Animation Classes */
-        .animate-on-scroll {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: var(--transition-smooth);
-        }
-
-        .animate-on-scroll.animate-in {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* RESPONSIVE */
+        @media(max-width:860px) { .contact-wrap { grid-template-columns:1fr; } .form-row { grid-template-columns:1fr; } .areas-grid { grid-template-columns:1fr 1fr; } }
+        @media(max-width:640px) { .nav-links { display:none; } .hero { padding:4rem 1.5rem 3rem; } section.content { padding:3.5rem 0; } .areas-grid { grid-template-columns:1fr; } }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <a href="index.html" class="logo">Odyssefs Liagkas</a>
-            <ul class="nav-links">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="fast_robots.html">Fast Robots Labs</a></li>
-                <li><a href="contact.html" class="active">Contact</a></li>
-            </ul>
+
+<nav>
+    <div class="nav-inner">
+        <a href="index.html" class="logo">Odyssefs Liagkas</a>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <!--<li><a href="fast_robots.html">Fast Robots Labs</a></li>-->
+            <li><a href="contact.html" class="active">Contact</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-eyebrow">Let's Connect</div>
+        <h1>Get <em>In Touch</em></h1>
+        <p class="hero-desc">
+            I'm always interested in discussing research collaborations, innovative projects,
+            and opportunities to contribute to the advancement of biomedical engineering,
+            AI or technology in medicine. Whether you're from academia or industry, I'd love to hear from you!
+        </p>
+    </div>
+</section>
+
+<!-- CONTACT -->
+<section class="content">
+    <div class="page fade-up">
+        <div class="contact-wrap">
+
+            <!-- INFO PANEL -->
+            <div class="info-panel">
+                <div class="info-panel-title">Contact Information</div>
+                <div class="info-panel-sub">Reach out through any of the channels below</div>
+
+                <div class="contact-item">
+                    <div class="ci-icon">💼</div>
+                    <div>
+                        <div class="ci-label">LinkedIn</div>
+                        <div class="ci-value"><a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank" rel="noopener">linkedin.com/in/odyssefs-liagkas</a></div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="ci-icon">📧</div>
+                    <div>
+                        <div class="ci-label">Email</div>
+                        <div class="ci-value">
+                            <a href="mailto:odliagkas@gmail.com" class="line">odliagkas@gmail.com</a>
+                            <a href="mailto:ol86@cornell.edu" class="line">ol86@cornell.edu</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="ci-icon">📱</div>
+                    <div>
+                        <div class="ci-label">Phone</div>
+                        <div class="ci-value">
+                            <!--<a href="tel:+16073423224" class="line">USA: +1 (607) 342-3224</a>-->
+                            <a href="tel:+306947003929" class="line">+30 6947 003 929</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="ci-icon">🎓</div>
+                    <div>
+                        <div class="ci-label">Academic Affiliation</div>
+                        <div class="ci-value">
+                            <span class="line">Cornell University</span>
+                            <span class="line" style="color:rgba(255,255,255,0.5);font-size:0.82rem;">College of Engineering · Meinig School of BME</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="ci-icon">📍</div>
+                    <div>
+                        <div class="ci-label">Location</div>
+                        <div class="ci-value">
+                            <span class="line">Athens, Greece</span>
+                            <!--<span class="line" style="color:rgba(255,255,255,0.5);font-size:0.82rem;">Athens, Greece</span>-->
+                        </div>
+                    </div>
+                </div>
+<!--
+                <div style="margin-top:1.75rem;">
+                    <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Open to collaborations in</div>
+                    <div class="areas-grid">
+                        <div class="area-chip"><div class="name">Biomedical Engineering</div><div class="desc">Devices, robotics, biomechanics</div></div>
+                        <div class="area-chip"><div class="name">AI in Medicine</div><div class="desc">ML, computer vision, cryo-EM</div></div>
+                        <div class="area-chip"><div class="name">Cancer Research</div><div class="desc">Drug discovery, inflammation</div></div>
+                        <div class="area-chip"><div class="name">Sustainable Tech</div><div class="desc">Biomaterials, green innovation</div></div>
+                    </div>
+                </div>-->
+            </div>
+
+            <!-- MESSAGE PANEL --><!--
+            <div class="msg-panel">
+                <div class="msg-panel-title">Send a Message</div>
+                <div class="msg-panel-sub">I'll get back to you as soon as possible</div>
+
+                <div id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="fname">First Name</label>
+                            <input class="form-input" type="text" id="fname" placeholder="Jane">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="lname">Last Name</label>
+                            <input class="form-input" type="text" id="lname" placeholder="Smith">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <input class="form-input" type="email" id="email" placeholder="jane@university.edu">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="subject">Subject / Context</label>
+                        <input class="form-input" type="text" id="subject" placeholder="Research collaboration, job opportunity…">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="message">Message</label>
+                        <textarea class="form-textarea" id="message" placeholder="Tell me about your project or opportunity…"></textarea>
+                    </div>
+
+                    <button class="form-btn" onclick="handleSubmit()">Send Message →</button>
+                    <p class="form-note">Or email directly at <a href="mailto:odliagkas@gmail.com" style="color:var(--copper);">odliagkas@gmail.com</a></p>
+                    <div class="success-msg" id="success-msg">✓ Message sent! I'll get back to you soon.</div>
+                </div>
+            </div>-->
+
         </div>
-    </nav>
+    </div>
+</section>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Hero Section -->
-        <section class="page-hero">
-            <div class="container">
-                <h1>Get In Touch</h1>
-                <p>
-                    I'm always interested in discussing research collaborations, innovative projects, 
-                    and opportunities to contribute to the advancement of biomedical engineering,
-                     AI or technology in general in medicine. Whether you're from academia or industry, I'd love to hear from you! 
-                </p>
-            </div>
-        </section>
+<footer>
+    <ul class="footer-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a></li>
+    </ul>
+    <p>&copy; 2026 Odyssefs Liagkas. All rights reserved.</p>
+</footer>
 
-        <!-- Contact Section -->
-        <section class="contact-section">
-            <div class="container">
-                <div class="contact-grid">
-                    <!-- Contact Information -->
-                    <div class="contact-info animate-on-scroll">
-                        <h2 class="info-title">Contact Information</h2>
+<script src="main.js"></script>
+<script>
+    // Fade-up
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
 
-                        <div class="contact-item">
-                            <div class="contact-icon">💼</div>
-                            <div class="contact-details">
-                                <h3>Linkedin</h3>
-                                <p><a href="https://www.linkedin.com/in/odyssefs-liagkas/"target="_blank" rel="noopener noreferrer">linkedin.com/in/odyssefs-liagkas/</a></p>
-
-                            </div>
-                        </div>                        
-
-                        <div class="contact-item">
-                            <div class="contact-icon">📧</div>
-                            <div class="contact-details">
-                                <h3>Email</h3>
-                                <p><a href="mailto:odliagkas@gmail.com">odliagkas@gmail.com</a></p>
-                                <p><a href="mailto:ol86@cornell.edu">ol86@cornell.edu</a></p>
-                            </div>
-                        </div>
-
-                        <div class="contact-item">
-                            <div class="contact-icon">📱</div>
-                            <div class="contact-details">
-                                <h3>Phone</h3>
-                                <p>USA: <a href="tel:+16073423224">+1 (607) 342-3224</a></p>
-                                <p>Greece: <a href="tel:+306947003929">+30 6947003929</a></p>
-                            </div>
-                        </div>
-
-                        <div class="contact-item">
-                            <div class="contact-icon">🎓</div>
-                            <div class="contact-details">
-                                <h3>Academic Affiliation</h3>
-                                <p>Cornell University</p>
-                                <p>Duffield College of Engineering</p>
-                                <p>Meinig School of Biomedical Engineering</p>
-                            </div>
-                        </div>
-
-                        <div class="contact-item">
-                            <div class="contact-icon">📍</div>
-                            <div class="contact-details">
-                                <h3>Location</h3>
-                                <p>Ithaca, NY, USA</p>
-                                <p>Athens, Greece</p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Professional Networks -->
-        <!--<section class="networks-section animate-on-scroll">
-            <div class="container">
-                <h2 class="section-title">Professional Networks</h2>
-                <div class="networks-grid">
-                    <div class="network-card">
-                        <div class="network-icon">💼</div>
-                        <h3 class="network-title">LinkedIn</h3>
-                        <p class="network-description">
-                            Connect with me on LinkedIn for professional networking and career opportunities.
-                        </p>
-                        <a href="https://www.linkedin.com" target="_blank" class="network-link">Connect on LinkedIn</a>
-                    </div>
-
-                    <div class="network-card">
-                        <div class="network-icon">🐙</div>
-                        <h3 class="network-title">GitHub</h3>
-                        <p class="network-description">
-                            Explore my research code and software projects on GitHub.
-                        </p>
-                        <a href="https://github.com" target="_blank" class="network-link">View GitHub Profile</a>
-                    </div>
-
-                    <div class="network-card">
-                        <div class="network-icon">📚</div>
-                        <h3 class="network-title">ResearchGate</h3>
-                        <p class="network-description">
-                            Follow my research publications and collaborations on ResearchGate.
-                        </p>
-                        <a href="https://www.researchgate.net" target="_blank" class="network-link">Follow on ResearchGate</a>
-                    </div>
-
-                    <div class="network-card">
-                        <div class="network-icon">🎓</div>
-                        <h3 class="network-title">Google Scholar</h3>
-                        <p class="network-description">
-                            View my academic publications and citation metrics on Google Scholar.
-                        </p>
-                        <a href="https://scholar.google.com" target="_blank" class="network-link">View Publications</a>
-                    </div>
-                </div>
-            </div>
-        </section> -->
-
-        <!-- Collaboration Opportunities -->
-        <!--<section class="collaboration-section animate-on-scroll">
-            <div class="container">
-                <div class="collaboration-content">
-                    <h2 class="collaboration-title">Collaboration Opportunities</h2>
-                    <p class="collaboration-description">
-                        I'm always open to discussing research collaborations, innovative projects, and opportunities 
-                        to contribute to the advancement of biomedical engineering and AI in medicine. Whether you're 
-                        from academia, industry, or a fellow researcher, I'd love to hear from you.
-                    </p>
-
-                    <div class="collaboration-areas">
-                        <div class="collaboration-area">
-                            <div class="area-name">Biomedical Engineering</div>
-                            <div class="area-description">Medical device innovation, robotics, biomechanics</div>
-                        </div>
-                        <div class="collaboration-area">
-                            <div class="area-name">AI in Medicine</div>
-                            <div class="area-description">Machine learning, computer vision, cryo-EM</div>
-                        </div>
-                        <div class="collaboration-area">
-                            <div class="area-name">Cancer Research</div>
-                            <div class="area-description">Drug discovery, inflammation, molecular biology</div>
-                        </div>
-                        <div class="collaboration-area">
-                            <div class="area-name">Sustainable Tech</div>
-                            <div class="area-description">Biomaterials, green technology, innovation</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main> -->
-
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="index.html">Home</a>
-                <a href="about.html">About</a>
-                <a href="contact.html">Contact</a>
-                <a href="https://www.linkedin.com/in/odyssefs-liagkas/" target="_blank">LinkedIn</a>
-            </div>
-            <p>&copy; 2025 Odyssefs Liagkas. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script src="main.js"></script>
-    <script>
-        // Initialize contact form
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeContactForm();
-        });
-    </script>
+    function handleSubmit() {
+        const fname = document.getElementById('fname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const msg = document.getElementById('message').value.trim();
+        if (!fname || !email || !msg) { alert('Please fill in your name, email, and message.'); return; }
+        const s = document.getElementById('success-msg');
+        s.style.display = 'block';
+        document.getElementById('fname').value = '';
+        document.getElementById('lname').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('subject').value = '';
+        document.getElementById('message').value = '';
+        setTimeout(() => { s.style.display = 'none'; }, 5000);
+    }
+</script>
 </body>
 </html>
